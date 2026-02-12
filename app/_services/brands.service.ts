@@ -1,3 +1,4 @@
+// Fixed import
 import { BrandType } from "../_types/Product.type";
 
 export async function getAllBrands(): Promise<BrandType[] | null> {
