@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"], 
+      "@/images/*" : ["./public/assits/images/*"]
     }
   },
   "include": [
