@@ -2,6 +2,23 @@ import { Message } from './../node_modules/react-hook-form/dist/types/errors.d';
 import { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
+declare module "next-auth" {
+  interface User {
+    userTokenfromBackend?: string;
+  }
+  interface Session {
+    user?: User & {
+      userTokenfromBackend?: string;
+    };
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    userTokenfromBackend?: string;
+  }
+}
+
 export const nextauthConfig: NextAuthOptions = {
 
   providers: [
