@@ -1,4 +1,4 @@
-import { BrandType } from "../_types/Product.type.tsx";
+import { BrandType } from "../_types/Product.type";
 
 export async function getAllBrands(): Promise<BrandType[] | null> {
     try {
