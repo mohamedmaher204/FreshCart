@@ -61,9 +61,11 @@ export default async function Home() {
                       Shop Now <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
-                  <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white hover:text-emerald-900 rounded-full px-8 h-14 text-lg">
-                    See Offers
-                  </Button>
+                  <Link href="/products?filter=offers">
+                    <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white hover:text-emerald-900 rounded-full px-8 h-14 text-lg">
+                      See Offers
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>

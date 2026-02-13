@@ -4,10 +4,14 @@ import { getAllProduct } from '../_services/products.services'
 import { getAllCategories } from '../_services/categoriec.service'
 import { Producttype, CategoryType } from '../_types/Product.type'
 import ProductCard from '../_component/productCard/ProductCard'
-import { Search, SlidersHorizontal, LayoutGrid, List, SortAsc, SortDesc, Loader2, Sparkles, ShoppingBag } from 'lucide-react'
+import { Search, SlidersHorizontal, LayoutGrid, List, SortAsc, SortDesc, Loader2, Sparkles, ShoppingBag, Percent } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useSearchParams } from 'next/navigation'
 
 export default function ProductsPage() {
+    const searchParams = useSearchParams()
+    const initialOfferFilter = searchParams.get('filter') === 'offers'
+
     const [products, setProducts] = useState<Producttype[]>([])
     const [categories, setCategories] = useState<CategoryType[]>([])
     const [loading, setLoading] = useState(true)
@@ -15,6 +19,7 @@ export default function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('default')
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+    const [showOffersOnly, setShowOffersOnly] = useState(initialOfferFilter)
 
     useEffect(() => {
         async function fetchData() {
@@ -51,6 +56,11 @@ export default function ProductsPage() {
             result = result.filter(p => p.category._id === selectedCategory)
         }
 
+        // Filter by Offers
+        if (showOffersOnly) {
+            result = result.filter(p => p.priceAfterDiscount && p.priceAfterDiscount < p.price)
+        }
+
         // Sort
         if (sortBy === 'price-low') {
             result.sort((a, b) => (a.priceAfterDiscount || a.price) - (b.priceAfterDiscount || b.price))
@@ -61,7 +71,7 @@ export default function ProductsPage() {
         }
 
         return result
-    }, [products, searchTerm, selectedCategory, sortBy])
+    }, [products, searchTerm, selectedCategory, sortBy, showOffersOnly])
 
     if (loading) {
         return (
@@ -114,6 +124,18 @@ export default function ProductsPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+                        {/* Offers Toggle */}
+                        <button
+                            onClick={() => setShowOffersOnly(!showOffersOnly)}
+                            className={`flex items-center gap-2 px-5 py-3.5 rounded-xl font-bold text-sm transition-all border-2 ${showOffersOnly
+                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-200'
+                                : 'bg-white border-gray-100 text-gray-500 hover:border-emerald-200 hover:text-emerald-600'
+                                }`}
+                        >
+                            <Percent className={`w-4 h-4 ${showOffersOnly ? 'animate-bounce' : ''}`} />
+                            Offers
+                        </button>
+
                         {/* Category Filter */}
                         <div className="flex-1 min-w-[160px]">
                             <select
@@ -165,9 +187,9 @@ export default function ProductsPage() {
                     <p className="text-gray-500 font-medium tracking-wide">
                         Showing <span className="text-gray-900 font-bold">{filteredAndSortedProducts.length}</span> Results
                     </p>
-                    {(searchTerm || selectedCategory !== 'all') && (
+                    {(searchTerm || selectedCategory !== 'all' || showOffersOnly) && (
                         <button
-                            onClick={() => { setSearchTerm(''); setSelectedCategory('all') }}
+                            onClick={() => { setSearchTerm(''); setSelectedCategory('all'); setShowOffersOnly(false) }}
                             className="text-sm font-bold text-red-500 hover:text-red-600 transition-colors uppercase tracking-widest"
                         >
                             Reset Filters
@@ -184,7 +206,7 @@ export default function ProductsPage() {
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">No products match your criteria</h3>
                         <p className="text-gray-500 max-w-sm mx-auto">Try adjusting your filters or search terms to find what you're looking for.</p>
                         <Button
-                            onClick={() => { setSearchTerm(''); setSelectedCategory('all') }}
+                            onClick={() => { setSearchTerm(''); setSelectedCategory('all'); setShowOffersOnly(false) }}
                             variant="outline"
                             className="mt-8 rounded-full px-8"
                         >
