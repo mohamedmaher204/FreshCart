@@ -7,7 +7,7 @@ import { updateQuantitySchema } from "@/app/_lib/validations";
 // PUT: Update item quantity
 export async function PUT(
     req: Request,
-    { params }: { params: { itemId: string } }
+    { params }: { params: Promise<{ itemId: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -90,7 +90,7 @@ export async function PUT(
 // DELETE: Remove item from cart
 export async function DELETE(
     req: Request,
-    { params }: { params: { itemId: string } }
+    { params }: { params: Promise<{ itemId: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
