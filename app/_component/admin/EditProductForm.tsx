@@ -46,7 +46,7 @@ export default function EditProductForm({ initialData }: EditProductFormProps) {
 
     const { register, formState: { errors }, watch, setValue } = form;
     const imageCover = watch('imageCover');
-    const images = watch('images');
+    const images = watch('images') || [];
 
     const onSubmit: SubmitHandler<ProductInput> = async (data) => {
         setLoading(true);
