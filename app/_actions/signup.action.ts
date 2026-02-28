@@ -1,23 +1,23 @@
 "use server";
 
 import axios from "axios";
-import { SignupSchema } from "../_Schema/signupSchema";
+import { RegisterInput } from "../_lib/validations";
 
 type SignupResponse =
-  | { success: true; message: string; user: any }
+  | { success: true; message: string; user?: any }
   | { success: false; message: string };
 
 export async function signupAction(
-  userData: SignupSchema
+  userData: RegisterInput
 ): Promise<SignupResponse> {
   try {
-    const { data } = await axios.post(
-      "https://ecommerce.routemisr.com/api/v1/auth/signup",
+    // Calling our internal API instead of the external one
+    const { data, status } = await axios.post(
+      `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/register`,
       userData
     );
 
-    // If successful, data usually contains { message: "success", user: {...}, token: "..." }
-    if (data.message === "success") {
+    if (status === 201) {
       return {
         success: true,
         message: "Account created successfully",
@@ -30,16 +30,10 @@ export async function signupAction(
       message: data.message || "Signup failed",
     };
   } catch (error: any) {
-    if (axios.isAxiosError(error)) {
-      console.error("Signup API Error Details:", error.response?.data);
-      return {
-        success: false,
-        message: error.response?.data?.message || "Signup failed: " + error.message,
-      };
-    }
+    console.error("Signup Action Error:", error.response?.data || error.message);
     return {
       success: false,
-      message: "An unexpected error occurred during signup.",
+      message: error.response?.data?.message || "Something went wrong during registration.",
     };
   }
 }

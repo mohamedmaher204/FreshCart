@@ -20,52 +20,39 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     const [updatingParams, setUpdatingParams] = useState<string | null>(null);
 
     // Calculate total price locally
-    const totalCartPrice = products?.reduce((acc: number, item: any) => acc + (item.price * item.count), 0) || 0;
+    const totalCartPrice = products?.reduce((acc: number, item: any) => acc + (item.product?.price * item.quantity), 0) || 0;
 
-    async function updateCount(id: string, count: number) {
-        if (count < 1) return;
-        setUpdatingParams(id);
+    async function updateCount(itemId: string, quantity: number) {
+        if (quantity < 1 || !itemId) return;
+        setUpdatingParams(itemId);
 
         try {
-            // @ts-ignore
-            const token = session?.user?.userTokenfromBackend;
-            const res = await axios.put(`https://ecommerce.routemisr.com/api/v1/cart/${id}`,
-                { count },
-                { headers: { token } }
-            );
+            const res = await axios.put(`/api/cart/${itemId}`, { quantity });
 
-            if (res.data.status === 'success') {
-                setNumOfCartItems(res.data.numOfCartItems);
-                setProducts(res.data.data.products);
-                setCartId(res.data.cartId);
+            if (res.data) {
+                refreshCart();
                 toast.success("Quantity updated", { position: "top-center" });
             }
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to update cart");
+        } catch (error: any) {
+            console.error("CartDrawer updateCount error:", error);
+            toast.error(error.response?.data?.message || "Failed to update cart");
         } finally {
             setUpdatingParams(null);
         }
     }
 
-    async function deleteItem(id: string) {
-        setUpdatingParams(id);
+    async function deleteItem(itemId: string) {
+        setUpdatingParams(itemId);
         try {
-            // @ts-ignore
-            const token = session?.user?.userTokenfromBackend;
-            const res = await axios.delete(`https://ecommerce.routemisr.com/api/v1/cart/${id}`,
-                { headers: { token } }
-            );
+            const res = await axios.delete(`/api/cart/${itemId}`);
 
-            if (res.data.status === 'success') {
-                setNumOfCartItems(res.data.numOfCartItems);
-                setProducts(res.data.data.products);
-                setCartId(res.data.cartId);
-                toast.success("Item removed");
+            if (res.status === 200) {
+                refreshCart();
+                toast.success("Item removed", { position: "top-center" });
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("Failed to remove item");
+            toast.error(error.response?.data?.message || "Failed to remove item");
         } finally {
             setUpdatingParams(null);
         }
@@ -82,13 +69,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             ></div>
 
             {/* Drawer Content */}
-            <div className={`absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-out animate-in slide-in-from-right`}>
+            <div className="absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-out animate-in slide-in-from-right">
 
                 {/* Header */}
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                     <div>
                         <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                            Shopping Cart
+                            Shopping Bag
                             <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">{products?.length || 0}</span>
                         </h2>
                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mt-1">Review your items before checkout</p>
@@ -109,7 +96,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                                 <ShoppingBag className="w-10 h-10" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-black text-gray-400">Your cart is empty</h3>
+                                <h3 className="text-lg font-black text-gray-400">YOUR BAG IS EMPTY</h3>
                                 <p className="text-sm text-gray-400 mt-2">Looks like you haven't added anything yet!</p>
                             </div>
                             <Button variant="outline" className="rounded-2xl border-2 px-8" onClick={onClose}>
@@ -118,8 +105,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         </div>
                     ) : (
                         products.map((item: any) => (
-                            <div key={item._id} className="relative group flex gap-4">
-                                {updatingParams === item.product.id && (
+                            <div key={item.productId || item.id} className="relative group flex gap-4">
+                                {(updatingParams === item.productId || updatingParams === item.id) && (
                                     <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px] rounded-2xl">
                                         <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
                                     </div>
@@ -127,8 +114,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
                                 <div className="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100">
                                     <Image
-                                        src={item.product.imageCover}
-                                        alt={item.product.title}
+                                        src={item.product?.imageCover || ""}
+                                        alt={item.product?.title || "Product"}
                                         width={80}
                                         height={80}
                                         className="w-full h-full object-contain p-2"
@@ -137,36 +124,36 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
                                 <div className="flex-grow min-w-0">
                                     <div className="flex justify-between items-start mb-1">
-                                        <h4 className="text-sm font-black text-gray-900 truncate pr-4" title={item.product.title}>{item.product.title}</h4>
+                                        <h4 className="text-sm font-black text-gray-900 truncate pr-4" title={item.product?.title}>{item.product?.title}</h4>
                                         <button
-                                            onClick={() => deleteItem(item.product.id)}
+                                            onClick={() => deleteItem(item.productId)}
                                             className="text-gray-300 hover:text-red-500 transition-colors"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">{item.product.brand?.name}</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">{item.product?.brand}</p>
 
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-1 border border-gray-100">
                                             <button
-                                                onClick={() => updateCount(item.product.id, item.count - 1)}
+                                                onClick={() => updateCount(item.productId, item.quantity - 1)}
                                                 className="w-6 h-6 flex items-center justify-center hover:bg-white rounded-lg text-gray-500"
-                                                disabled={item.count <= 1}
+                                                disabled={item.quantity <= 1}
                                             >
                                                 <Minus className="w-2 h-2" />
                                             </button>
-                                            <span className="w-5 text-center text-xs font-black text-gray-900">{item.count}</span>
+                                            <span className="w-5 text-center text-xs font-black text-gray-900">{item.quantity}</span>
                                             <button
-                                                onClick={() => updateCount(item.product.id, item.count + 1)}
+                                                onClick={() => updateCount(item.productId, item.quantity + 1)}
                                                 className="w-6 h-6 flex items-center justify-center hover:bg-white rounded-lg text-gray-500"
                                             >
                                                 <Plus className="w-2 h-2" />
                                             </button>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-sm font-black text-emerald-600">EGP {item.price * item.count}</p>
-                                            <p className="text-[10px] text-gray-400 font-bold">EGP {item.price}/ea</p>
+                                            <p className="text-sm font-black text-emerald-600">EGP {item.product?.price * item.quantity}</p>
+                                            <p className="text-[10px] text-gray-400 font-bold">EGP {item.product?.price}/ea</p>
                                         </div>
                                     </div>
                                 </div>
@@ -197,7 +184,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         <div className="flex flex-col gap-3">
                             <Link href="/checkout" onClick={onClose} className="w-full">
                                 <Button className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[1.25rem] font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-500/20 group">
-                                    Secure Checkout <CreditCard className="ml-2 w-5 h-5 group-hover:animate-bounce" />
+                                    PROCEED TO SECURE CHECKOUT <CreditCard className="ms-2 w-5 h-5 group-hover:animate-bounce" />
                                 </Button>
                             </Link>
                             <Link href="/cart" onClick={onClose} className="w-full">

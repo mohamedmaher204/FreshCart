@@ -6,24 +6,19 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import PageLoader from '@/app/_component/ui/PageLoader'
 
 interface OrderProduct {
     count: number
     _id: string
+    price: number
     product: {
         _id: string
         title: string
         imageCover: string
-        category: {
-            _id: string
-            name: string
-        }
-        brand: {
-            _id: string
-            name: string
-        }
+        category?: any
+        brand?: any
     }
-    price: number
 }
 
 interface Order {
@@ -34,16 +29,8 @@ interface Order {
     isDelivered: boolean
     createdAt: string
     cartItems: OrderProduct[]
-    shippingAddress: {
-        details: string
-        phone: string
-        city: string
-    }
-    user: {
-        _id: string
-        name: string
-        email: string
-    }
+    shippingAddress?: any
+    user?: any
 }
 
 export default function AllOrdersPage() {
@@ -74,11 +61,11 @@ export default function AllOrdersPage() {
 
     const getStatusBadge = (order: Order) => {
         if (order.isDelivered) {
-            return <Badge className="bg-green-500 hover:bg-green-600 text-white border-0"><CheckCircle2 className="w-3 h-3 mr-1" /> Delivered</Badge>
+            return <Badge className="bg-emerald-500 text-white border-0 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest"><CheckCircle2 className="w-3 h-3 ms-1" /> Delivered</Badge>
         } else if (order.isPaid) {
-            return <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0"><Truck className="w-3 h-3 mr-1" /> In Transit</Badge>
+            return <Badge className="bg-blue-500 text-white border-0 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest"><Truck className="w-3 h-3 ms-1" /> In Transit</Badge>
         } else {
-            return <Badge className="bg-amber-500 hover:bg-amber-600 text-white border-0"><Clock className="w-3 h-3 mr-1" /> Pending Payment</Badge>
+            return <Badge className="bg-amber-500 text-white border-0 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest"><Clock className="w-3 h-3 ms-1" /> Pending</Badge>
         }
     }
 
@@ -102,30 +89,22 @@ export default function AllOrdersPage() {
         return true
     })
 
-    if (loading) {
-        return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 bg-gradient-to-br from-gray-50 to-gray-100">
-                <Loader2 className="w-16 h-16 text-emerald-500 animate-spin mb-4" />
-                <h2 className="text-2xl font-semibold text-gray-700">Loading your orders...</h2>
-                <p className="text-gray-500 mt-2">Please wait while we fetch your order history</p>
-            </div>
-        )
-    }
+    if (loading) return <PageLoader />;
 
     if (error) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center p-4 bg-gradient-to-br from-red-50 to-gray-50">
-                <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full border border-red-100">
-                    <div className="bg-red-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <XCircle className="w-10 h-10 text-red-600" />
+            <div className="min-h-[70vh] flex flex-col items-center justify-center p-4">
+                <div className="bg-white dark:bg-zinc-900 p-12 rounded-[2.5rem] shadow-2xl dark:shadow-none text-center max-w-md w-full border border-red-50 dark:border-red-900/20">
+                    <div className="bg-red-50 dark:bg-red-500/10 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+                        <XCircle className="w-12 h-12 text-red-500" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Orders</h2>
-                    <p className="text-gray-600 mb-6">{error}</p>
+                    <h2 className="text-3xl font-black text-gray-900 dark:text-zinc-100 mb-2 tracking-tight">DATA ERROR</h2>
+                    <p className="text-gray-500 dark:text-zinc-500 mb-10 font-medium leading-relaxed">{error}</p>
                     <Button
                         onClick={() => window.location.reload()}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        className="w-full bg-gray-900 dark:bg-zinc-800 hover:bg-black dark:hover:bg-zinc-700 text-white rounded-2xl h-14 font-black uppercase tracking-widest text-xs"
                     >
-                        Try Again
+                        Re-initialize Connection
                     </Button>
                 </div>
             </div>
@@ -134,37 +113,44 @@ export default function AllOrdersPage() {
 
     if (orders.length === 0) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center p-4 bg-gradient-to-br from-emerald-50 to-gray-50 animate-in fade-in zoom-in duration-500">
-                <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl text-center max-w-md w-full border border-gray-100">
-                    <div className="bg-emerald-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Package className="w-12 h-12 text-emerald-600" />
+            <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950 pb-20 transition-colors">
+                <div className="relative bg-emerald-600 py-20 overflow-hidden mb-20 text-center">
+                    <div className="container mx-auto px-4 relative z-10">
+                        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase">MY <span className="text-emerald-200">ORDERS</span></h1>
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-3">No Orders Yet</h2>
-                    <p className="text-gray-500 mb-8">You haven't placed any orders yet. Start shopping to see your orders here!</p>
-                    <Link href="/product">
-                        <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200" size="lg">
-                            <ShoppingBag className="mr-2 w-5 h-5" /> Start Shopping
-                        </Button>
-                    </Link>
+                </div>
+                <div className="container mx-auto px-4">
+                    <div className="bg-white dark:bg-zinc-900 p-16 md:p-24 rounded-[3rem] shadow-xl shadow-gray-200/50 dark:shadow-none text-center max-w-3xl mx-auto border border-gray-100 dark:border-zinc-800 animate-in zoom-in duration-700">
+                        <div className="bg-emerald-50 dark:bg-emerald-500/10 w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                            <Package className="w-14 h-14 text-emerald-200 dark:text-emerald-500/50" />
+                        </div>
+                        <h2 className="text-3xl font-black text-gray-900 dark:text-zinc-100 mb-4 uppercase tracking-tight">HISTORY IS EMPTY</h2>
+                        <p className="text-gray-500 dark:text-zinc-500 mb-12 font-medium leading-relaxed max-w-sm mx-auto">Your order history is like a blank canvas. Time to start your shopping journey!</p>
+                        <Link href="/products">
+                            <Button className="rounded-2xl px-12 h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-lg shadow-2xl shadow-emerald-100 transition-all hover:-translate-y-1">
+                                Discover Catalog
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </div>
         )
     }
 
     return (
-        <section className="bg-gradient-to-br from-gray-50 via-white to-gray-50 py-8 md:py-12 min-h-screen">
+        <section className="bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-950 py-8 md:py-12 min-h-screen transition-colors duration-500">
             <div className="container mx-auto px-4 max-w-7xl">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                        <Package className="w-8 h-8 md:w-10 md:h-10 text-emerald-600" />
+                    <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-zinc-100 mb-2 flex items-center gap-3">
+                        <Package className="w-8 h-8 md:w-10 md:h-10 text-emerald-600 dark:text-emerald-400" />
                         My Orders
                     </h1>
-                    <p className="text-gray-600 text-lg">Track and manage all your orders in one place</p>
+                    <p className="text-gray-600 dark:text-zinc-500 text-lg">Track and manage all your orders in one place</p>
                 </div>
 
                 {/* Filters and Search */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-8">
+                <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 p-4 md:p-6 mb-8">
                     <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                         {/* Search */}
                         <div className="relative w-full md:w-96">
@@ -174,7 +160,7 @@ export default function AllOrdersPage() {
                                 placeholder="Search by order ID or product name..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 dark:text-zinc-100"
                             />
                         </div>
 
@@ -183,7 +169,7 @@ export default function AllOrdersPage() {
                             <Button
                                 variant={filterStatus === 'all' ? 'default' : 'outline'}
                                 onClick={() => setFilterStatus('all')}
-                                className={filterStatus === 'all' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+                                className={filterStatus === 'all' ? 'bg-emerald-600 hover:bg-emerald-700' : 'dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800'}
                                 size="sm"
                             >
                                 All Orders ({Array.isArray(orders) ? orders.length : 0})
@@ -191,7 +177,7 @@ export default function AllOrdersPage() {
                             <Button
                                 variant={filterStatus === 'pending' ? 'default' : 'outline'}
                                 onClick={() => setFilterStatus('pending')}
-                                className={filterStatus === 'pending' ? 'bg-amber-500 hover:bg-amber-600' : ''}
+                                className={filterStatus === 'pending' ? 'bg-amber-500 hover:bg-amber-600' : 'dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800'}
                                 size="sm"
                             >
                                 Pending ({Array.isArray(orders) ? orders.filter(o => !o.isPaid).length : 0})
@@ -199,7 +185,7 @@ export default function AllOrdersPage() {
                             <Button
                                 variant={filterStatus === 'paid' ? 'default' : 'outline'}
                                 onClick={() => setFilterStatus('paid')}
-                                className={filterStatus === 'paid' ? 'bg-blue-500 hover:bg-blue-600' : ''}
+                                className={filterStatus === 'paid' ? 'bg-blue-500 hover:bg-blue-600' : 'dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800'}
                                 size="sm"
                             >
                                 Paid ({Array.isArray(orders) ? orders.filter(o => o.isPaid).length : 0})
@@ -207,7 +193,7 @@ export default function AllOrdersPage() {
                             <Button
                                 variant={filterStatus === 'delivered' ? 'default' : 'outline'}
                                 onClick={() => setFilterStatus('delivered')}
-                                className={filterStatus === 'delivered' ? 'bg-green-500 hover:bg-green-600' : ''}
+                                className={filterStatus === 'delivered' ? 'bg-green-500 hover:bg-green-600' : 'dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800'}
                                 size="sm"
                             >
                                 Delivered ({Array.isArray(orders) ? orders.filter(o => o.isDelivered).length : 0})
@@ -218,29 +204,29 @@ export default function AllOrdersPage() {
 
                 {/* Orders List */}
                 {filteredOrders.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-                        <Filter className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-gray-700 mb-2">No orders found</h3>
-                        <p className="text-gray-500">Try adjusting your filters or search term</p>
+                    <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 p-12 text-center">
+                        <Filter className="w-16 h-16 text-gray-300 dark:text-zinc-700 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-700 dark:text-zinc-300 mb-2">No orders found</h3>
+                        <p className="text-gray-500 dark:text-zinc-500">Try adjusting your filters or search term</p>
                     </div>
                 ) : (
                     <div className="space-y-6">
                         {filteredOrders.map((order) => (
                             <div
                                 key={order._id}
-                                className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden"
+                                className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 hover:shadow-lg dark:hover:shadow-none transition-all duration-300 overflow-hidden"
                             >
                                 {/* Order Header */}
-                                <div className="bg-gradient-to-r from-emerald-50 to-blue-50 p-4 md:p-6 border-b border-gray-100">
+                                <div className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-zinc-800/50 dark:to-zinc-800/30 p-4 md:p-6 border-b border-gray-100 dark:border-zinc-800">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-2">
-                                                <h3 className="text-lg md:text-xl font-bold text-gray-900">
+                                                <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-zinc-100">
                                                     Order #{order._id.slice(-8).toUpperCase()}
                                                 </h3>
                                                 {getStatusBadge(order)}
                                             </div>
-                                            <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                                            <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-zinc-400">
                                                 <div className="flex items-center gap-1">
                                                     <Calendar className="w-4 h-4" />
                                                     {new Date(order.createdAt).toLocaleDateString('en-US', {
@@ -256,9 +242,9 @@ export default function AllOrdersPage() {
                                             </div>
                                         </div>
                                         <div className="text-left md:text-right">
-                                            <p className="text-sm text-gray-500 mb-1">Total Amount</p>
-                                            <p className="text-2xl md:text-3xl font-bold text-emerald-600">
-                                                ${order.totalOrderPrice}
+                                            <p className="text-sm text-gray-500 dark:text-zinc-500 mb-1">Total Amount</p>
+                                            <p className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                                                EGP {order.totalOrderPrice}
                                             </p>
                                         </div>
                                     </div>
@@ -266,17 +252,17 @@ export default function AllOrdersPage() {
 
                                 {/* Order Items */}
                                 <div className="p-4 md:p-6">
-                                    <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                        <Package className="w-5 h-5 text-emerald-600" />
+                                    <h4 className="font-semibold text-gray-900 dark:text-zinc-100 mb-4 flex items-center gap-2">
+                                        <Package className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                                         Order Items ({order.cartItems.length})
                                     </h4>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                                         {order.cartItems.map((item) => (
                                             <div
                                                 key={item._id}
-                                                className="flex gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                                                className="flex gap-3 p-3 bg-gray-50 dark:bg-zinc-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
                                             >
-                                                <div className="w-20 h-20 flex-shrink-0 bg-white rounded-lg overflow-hidden relative border border-gray-200">
+                                                <div className="w-20 h-20 flex-shrink-0 bg-white dark:bg-zinc-900 rounded-lg overflow-hidden relative border border-gray-200 dark:border-zinc-800">
                                                     <Image
                                                         src={item.product.imageCover}
                                                         alt={item.product.title}
@@ -285,13 +271,13 @@ export default function AllOrdersPage() {
                                                     />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h5 className="font-semibold text-sm text-gray-900 line-clamp-2 mb-1">
+                                                    <h5 className="font-semibold text-sm text-gray-900 dark:text-zinc-100 line-clamp-2 mb-1">
                                                         {item.product.title}
                                                     </h5>
-                                                    <p className="text-xs text-gray-500 mb-1">{item.product.brand?.name}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-zinc-500 mb-1">{item.product.brand?.name}</p>
                                                     <div className="flex items-center justify-between">
-                                                        <span className="text-xs text-emerald-600 font-medium">Qty: {item.count}</span>
-                                                        <span className="text-sm font-bold text-gray-900">${item.price}</span>
+                                                        <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Qty: {item.count}</span>
+                                                        <span className="text-sm font-bold text-gray-900 dark:text-zinc-100">EGP {item.price}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -299,23 +285,23 @@ export default function AllOrdersPage() {
                                     </div>
 
                                     {/* Shipping Address */}
-                                    <div className="bg-gradient-to-r from-blue-50 to-emerald-50 rounded-lg p-4 border border-blue-100">
-                                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                            <MapPin className="w-5 h-5 text-blue-600" />
+                                    <div className="bg-gradient-to-r from-blue-50 to-emerald-50 dark:from-zinc-800/50 dark:to-zinc-800/30 rounded-lg p-4 border border-blue-100 dark:border-zinc-800">
+                                        <h4 className="font-semibold text-gray-900 dark:text-zinc-100 mb-3 flex items-center gap-2">
+                                            <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                             Shipping Address
                                         </h4>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                                             <div>
-                                                <p className="text-gray-500 mb-1">Address</p>
-                                                <p className="font-medium text-gray-900">{order.shippingAddress?.details || 'N/A'}</p>
+                                                <p className="text-gray-500 dark:text-zinc-500 mb-1">Address</p>
+                                                <p className="font-medium text-gray-900 dark:text-zinc-100">{order.shippingAddress?.details || 'N/A'}</p>
                                             </div>
                                             <div>
-                                                <p className="text-gray-500 mb-1">City</p>
-                                                <p className="font-medium text-gray-900">{order.shippingAddress?.city || 'N/A'}</p>
+                                                <p className="text-gray-500 dark:text-zinc-500 mb-1">City</p>
+                                                <p className="font-medium text-gray-900 dark:text-zinc-100">{order.shippingAddress?.city || 'N/A'}</p>
                                             </div>
                                             <div>
-                                                <p className="text-gray-500 mb-1">Phone</p>
-                                                <p className="font-medium text-gray-900">{order.shippingAddress?.phone || 'N/A'}</p>
+                                                <p className="text-gray-500 dark:text-zinc-500 mb-1">Phone</p>
+                                                <p className="font-medium text-gray-900 dark:text-zinc-100">{order.shippingAddress?.phone || 'N/A'}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -341,7 +327,7 @@ export default function AllOrdersPage() {
                             <div>
                                 <p className="text-blue-100 text-sm mb-1">Total Spent</p>
                                 <p className="text-3xl font-bold">
-                                    ${Array.isArray(orders) ? orders.reduce((sum, order) => sum + order.totalOrderPrice, 0) : 0}
+                                    EGP {Array.isArray(orders) ? orders.reduce((sum, order) => sum + order.totalOrderPrice, 0) : 0}
                                 </p>
                             </div>
                             <CreditCard className="w-12 h-12 text-blue-200" />

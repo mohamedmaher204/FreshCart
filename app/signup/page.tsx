@@ -5,7 +5,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SignupSchema, signupSchema } from '../_Schema/signupSchema'
+import { registerSchema, RegisterInput } from '@/app/_lib/validations'
 import { Loader2, User, Mail, Phone, Lock, ArrowRight, Sparkles } from 'lucide-react'
 import { signupAction } from "../_actions/signup.action"
 import { useRouter } from "next/navigation"
@@ -16,7 +16,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const form = useForm<SignupSchema>({
+  const form = useForm<RegisterInput>({
     defaultValues: {
       name: '',
       email: '',
@@ -24,10 +24,10 @@ export default function SignupPage() {
       password: '',
       rePassword: '',
     },
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(registerSchema),
   })
 
-  async function onSubmit(values: SignupSchema) {
+  async function onSubmit(values: RegisterInput) {
     try {
       setLoading(true)
       const res = await signupAction(values)
@@ -47,14 +47,14 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center p-6 bg-gray-50/50">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-emerald-900/5 border border-gray-100 p-8 md:p-10">
+    <div className="min-h-[80vh] flex items-center justify-center p-6 bg-gray-50/50 dark:bg-zinc-950 transition-colors duration-500">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-xl shadow-emerald-900/5 dark:shadow-none border border-gray-100 dark:border-zinc-800 p-8 md:p-10">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 mb-4">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-4">
             <Sparkles className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-black text-gray-900">Create Account</h1>
-          <p className="text-gray-500 text-sm mt-1">Join FreshCart and start shopping</p>
+          <h1 className="text-2xl font-black text-gray-900 dark:text-zinc-100">Create Account</h1>
+          <p className="text-gray-500 dark:text-zinc-500 text-sm mt-1">Join FreshCart and start shopping</p>
         </div>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
@@ -63,12 +63,12 @@ export default function SignupPage() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Full Name</FieldLabel>
+                <FieldLabel className="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider ml-1">Full Name</FieldLabel>
                 <div className="relative group">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
                   <Input
                     {...field}
-                    className="h-12 pl-11 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                    className="h-12 pl-11 rounded-xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:bg-white dark:focus:bg-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all dark:text-zinc-100"
                     placeholder="John Doe"
                   />
                 </div>
@@ -82,13 +82,13 @@ export default function SignupPage() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Email Address</FieldLabel>
+                <FieldLabel className="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider ml-1">Email Address</FieldLabel>
                 <div className="relative group">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
                   <Input
                     {...field}
                     type="email"
-                    className="h-12 pl-11 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                    className="h-12 pl-11 rounded-xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:bg-white dark:focus:bg-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all dark:text-zinc-100"
                     placeholder="name@example.com"
                   />
                 </div>
@@ -102,12 +102,12 @@ export default function SignupPage() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Phone Number</FieldLabel>
+                <FieldLabel className="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider ml-1">Phone Number</FieldLabel>
                 <div className="relative group">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
                   <Input
                     {...field}
-                    className="h-12 pl-11 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                    className="h-12 pl-11 rounded-xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:bg-white dark:focus:bg-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all dark:text-zinc-100"
                     placeholder="01xxxxxxxxx"
                   />
                 </div>
@@ -122,13 +122,13 @@ export default function SignupPage() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Password</FieldLabel>
+                  <FieldLabel className="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider ml-1">Password</FieldLabel>
                   <div className="relative group">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
                     <Input
                       {...field}
                       type="password"
-                      className="h-12 pl-11 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                      className="h-12 pl-11 rounded-xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:bg-white dark:focus:bg-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all dark:text-zinc-100"
                       placeholder="••••••"
                     />
                   </div>
@@ -142,13 +142,13 @@ export default function SignupPage() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Confirm</FieldLabel>
+                  <FieldLabel className="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider ml-1">Confirm</FieldLabel>
                   <div className="relative group">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
                     <Input
                       {...field}
                       type="password"
-                      className="h-12 pl-11 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                      className="h-12 pl-11 rounded-xl bg-gray-50 dark:bg-zinc-800 border-transparent focus:bg-white dark:focus:bg-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all dark:text-zinc-100"
                       placeholder="••••••"
                     />
                   </div>
@@ -161,7 +161,7 @@ export default function SignupPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-200 dark:shadow-none transition-all active:scale-[0.98] flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="animate-spin w-5 h-5" /> : <>Sign Up <ArrowRight className="w-4 h-4" /></>}
           </Button>

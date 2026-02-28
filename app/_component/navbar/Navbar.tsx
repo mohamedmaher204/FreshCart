@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Heart, ShoppingCart, User, LogOut, Menu, X, Search as SearchIcon } from 'lucide-react'
 import LiveSearch from './LiveSearch'
 import CartDrawer from '../cartDrawer/CartDrawer'
+import ThemeToggle from '../ui/ThemeToggle'
 
 export default function Navbar() {
   const { numOfCartItems } = useContext(cartContext)
@@ -18,16 +19,31 @@ export default function Navbar() {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Track scroll for navbar effects
+  // Track scroll for navbar effects and direction
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+
+      // Fixed effects (bg color etc)
+      setIsScrolled(currentScrollY > 20);
+
+      // Visibility (Hide on scroll down, show on scroll up)
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -37,9 +53,10 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${isScrolled
-        ? 'py-2 px-4 md:px-8 bg-emerald-700/80 backdrop-blur-xl shadow-2xl border-b border-white/10'
-        : 'py-4 px-4 md:px-8 bg-gradient-to-r from-emerald-600 to-teal-700'
+      <nav className={`fixed left-0 right-0 z-[100] transition-all duration-700 ease-in-out ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+        } ${isScrolled
+          ? 'top-4 mx-auto w-[95%] md:w-[90%] max-w-[1400px] rounded-[2.5rem] py-2 px-6 bg-[#065f46]/80 dark:bg-zinc-900/80 backdrop-blur-2xl shadow-2xl border border-white/10'
+          : 'top-0 w-full py-5 px-4 md:px-12 bg-gradient-to-r from-[#059669] to-[#0d9488] dark:from-zinc-950 dark:to-zinc-900'
         }`}>
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8">
 
@@ -48,25 +65,25 @@ export default function Navbar() {
             href={'/'}
             className='flex items-center gap-3 transition-all flex-shrink-0 group'
           >
-            <div className="bg-white p-2 rounded-2xl shadow-xl group-hover:rotate-12 transition-transform duration-500">
+            <div className="bg-white dark:bg-emerald-500 p-2 rounded-2xl shadow-xl group-hover:rotate-12 transition-transform duration-500">
               <Image
                 src={logo}
                 alt="Fresh Cart Logo"
-                className='w-7 h-7 md:w-8 md:h-8'
+                className='w-7 h-7 md:w-8 md:h-8 dark:invert'
               />
             </div>
             <span className='font-black text-xl md:text-2xl text-white tracking-tighter'>
               FRESH<span className="text-emerald-200">CART</span>
             </span>
           </Link>
- 
+
           {/* Desktop Navigation Links */}
           <ul className='hidden xl:flex items-center gap-1 flex-shrink-0'>
             {navLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className='px-5 py-2.5 rounded-2xl font-black text-[13px] uppercase tracking-widest text-white/80 hover:text-white hover:bg-white/10 transition-all'
+                  className='px-5 py-2.5 rounded-2xl font-black text-[13px] uppercase tracking-widest text-white/80 dark:text-gray-400 hover:text-white dark:hover:text-emerald-400 hover:bg-white/10 transition-all'
                 >
                   {link.label}
                 </Link>
@@ -79,6 +96,11 @@ export default function Navbar() {
 
           {/* Action Buttons Section */}
           <div className='flex items-center gap-2 md:gap-3 flex-shrink-0'>
+
+            {/* Theme Toggle & Language Toggle - Desktop */}
+            <div className="hidden md:flex items-center gap-1.5 p-1 bg-white/5 rounded-[1.4rem] border border-white/10">
+              <ThemeToggle />
+            </div>
 
             {/* Wishlist Link */}
             <Link href="/wishlist" className="relative p-3 text-white hover:bg-white/10 rounded-2xl transition-all group overflow-hidden">
@@ -113,13 +135,26 @@ export default function Navbar() {
                 </div>
               ) : session ? (
                 <div className="flex items-center gap-2">
+                  <div className="flex flex-col items-end hidden sm:flex">
+                    {(session.user as any).role === 'admin' && (
+                      <Link href="/admin" className="text-[10px] text-amber-400 font-black uppercase tracking-[0.2em] mb-1 hover:text-amber-300 transition-colors">
+                        Admin Suite
+                      </Link>
+                    )}
+                    <span className="text-[9px] text-emerald-100 font-black uppercase tracking-[0.2em] opacity-60">Account</span>
+                  </div>
                   <Link href="/profile" className="flex items-center gap-3 px-3 py-1.5 rounded-2xl hover:bg-white/10 transition-all group border border-transparent hover:border-white/10">
-                    <div className="flex flex-col items-end hidden sm:flex">
-                      <span className="text-[9px] text-emerald-100 font-black uppercase tracking-[0.2em] opacity-60">Account</span>
-                      <span className="text-[13px] text-white font-black">{session.user?.name?.split(' ')[0]}</span>
-                    </div>
-                    <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-white border border-white/10 group-hover:bg-white group-hover:text-emerald-700 transition-all duration-500 shadow-lg">
-                      <User className="w-6 h-6" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-white border border-white/10 group-hover:bg-white group-hover:text-emerald-700 transition-all duration-500 shadow-lg overflow-hidden relative">
+                      {(session.user as any).image ? (
+                        <Image
+                          src={(session.user as any).image}
+                          alt={session?.user?.name || 'Profile'}
+                          fill
+                          className="object-cover object-top transition-transform group-hover:scale-110"
+                        />
+                      ) : (
+                        <User className="w-6 h-6" />
+                      )}
                     </div>
                   </Link>
                   <div className="h-8 w-px bg-white/10 mx-1"></div>
@@ -155,8 +190,16 @@ export default function Navbar() {
 
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
-          <div className='absolute top-full left-0 right-0 lg:hidden bg-emerald-700 border-t border-white/10 shadow-2xl animate-in slide-in-from-top duration-500 backdrop-blur-3xl overflow-hidden rounded-b-[2.5rem]'>
+          <div className='absolute top-full left-0 right-0 lg:hidden bg-emerald-700 dark:bg-zinc-950 border-t border-white/10 shadow-2xl animate-in slide-in-from-top duration-500 backdrop-blur-3xl overflow-hidden rounded-b-[2.5rem]'>
             <div className='p-6'>
+              {/* Mobile Header Row with Theme Toggle */}
+              <div className="flex items-center justify-between mb-8">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50">Interface Settings</p>
+                <div className="bg-white/5 rounded-2xl p-1 border border-white/10 flex items-center gap-2">
+                  <ThemeToggle />
+                </div>
+              </div>
+
               {/* Mobile Search - Show on mobile inside menu */}
               <div className='mb-8 md:hidden relative'>
                 <SearchIcon className='absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40' />
@@ -207,7 +250,18 @@ export default function Navbar() {
                       onClick={() => setMobileMenuOpen(false)}
                       className="flex items-center gap-4 px-6 py-4 text-white font-black text-sm rounded-[1.25rem] hover:bg-white/5"
                     >
-                      <div className='w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center'><User className="w-5 h-5" /></div> Profile Dashboard
+                      <div className='w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden relative'>
+                        {(session.user as any).image ? (
+                          <Image
+                            src={(session.user as any).image}
+                            alt={session?.user?.name || 'Profile'}
+                            fill
+                            className="object-cover object-top"
+                          />
+                        ) : (
+                          <User className="w-5 h-5" />
+                        )}
+                      </div> Profile Dashboard
                     </Link>
                     <button
                       onClick={() => signOut()}

@@ -1,4 +1,4 @@
-
+"use client"
 import React, { lazy, Suspense } from 'react'
 import { getAllProduct } from './_services/products.services';
 import ProductCard from './_component/productCard/ProductCard';
@@ -12,10 +12,15 @@ import imagList2 from '@/images/slider-image-2.jpeg'
 import imagList3 from '@/images/slider-image-3.jpeg'
 
 const CategoriesSlider = lazy(() => import('./product/[id]/CategoriesSlider/CategoriesSlider'));
+import Recommendations from './_component/recommendations/Recommendations';
 
-export default async function Home() {
+export default function Home() {
   const imagList = [imagList1.src, imagList2.src, imagList3.src];
-  const products = await getAllProduct();
+  const [products, setProducts] = React.useState<any[] | null>([]);
+
+  React.useEffect(() => {
+    getAllProduct().then(data => setProducts(data));
+  }, []);
 
   if (products === null) {
     return (
@@ -35,7 +40,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="bg-[#fafafa] min-h-screen pb-20">
+    <main className="bg-[#fafafa] dark:bg-zinc-950 min-h-screen pb-20 transition-colors duration-500">
       {/* Hero Section with Slider */}
       <section className="relative group">
         <div className="relative overflow-hidden">
@@ -48,22 +53,22 @@ export default async function Home() {
                 <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/90 text-white text-xs font-bold uppercase tracking-widest backdrop-blur-sm">
                   <Sparkles className="w-3 h-3" /> New Season Arrivals
                 </span>
-                <h1 className="text-5xl md:text-7xl font-black text-white drop-shadow-2xl leading-[1.1]">
-                  ELEVATE YOUR <br />
-                  <span className="text-emerald-400">LIFESTYLE</span>
+                <h1 className="text-5xl md:text-7xl font-black text-white drop-shadow-2xl leading-[1.1] uppercase">
+                  Elevate Your <br />
+                  <span className="text-emerald-400">Everyday Lifestyle</span>
                 </h1>
                 <p className="text-white/90 text-lg md:text-xl font-medium drop-shadow-lg max-w-md">
-                  Discover premium quality products curated just for your unique taste and modern needs.
+                  Discover the intersection of luxury and technology. Shop our curated collection of premium products.
                 </p>
                 <div className="flex gap-4 pt-4 pointer-events-auto">
                   <Link href="/products">
                     <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-8 h-14 text-lg shadow-xl shadow-emerald-900/20 group">
-                      Shop Now <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      Discover Shop <ArrowRight className="ms-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
                   <Link href="/products?filter=offers">
                     <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white hover:text-emerald-900 rounded-full px-8 h-14 text-lg">
-                      See Offers
+                      Special Offers
                     </Button>
                   </Link>
                 </div>
@@ -74,15 +79,15 @@ export default async function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 -mt-12 relative z-20">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 bg-white rounded-3xl p-8 shadow-2xl shadow-gray-200/50 border border-gray-100">
+      <section className="container mx-auto px-4 -mt-12 relative z-20 animate-reveal">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800 transition-colors duration-500">
           <div className="flex items-center gap-4 p-4 border-b md:border-b-0 md:border-r border-gray-50 last:border-0 transition-colors hover:bg-emerald-50/50 rounded-2xl group">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
               <Truck className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-gray-900">Free Delivery</h4>
-              <p className="text-xs text-gray-500">On all orders over $100</p>
+              <h4 className="font-bold text-gray-900 dark:text-zinc-100">Free Delivery</h4>
+              <p className="text-xs text-gray-500 dark:text-zinc-500">On orders over $500</p>
             </div>
           </div>
           <div className="flex items-center gap-4 p-4 border-b md:border-b-0 md:border-r border-gray-50 last:border-0 transition-colors hover:bg-emerald-50/50 rounded-2xl group">
@@ -91,7 +96,7 @@ export default async function Home() {
             </div>
             <div>
               <h4 className="font-bold text-gray-900">Secure Payment</h4>
-              <p className="text-xs text-gray-500">100% secure checkouts</p>
+              <p className="text-xs text-gray-500">100% safe transactions</p>
             </div>
           </div>
           <div className="flex items-center gap-4 p-4 border-b md:border-b-0 md:border-r border-gray-50 last:border-0 transition-colors hover:bg-emerald-50/50 rounded-2xl group">
@@ -100,7 +105,7 @@ export default async function Home() {
             </div>
             <div>
               <h4 className="font-bold text-gray-900">24/7 Support</h4>
-              <p className="text-xs text-gray-500">Expert help anytime</p>
+              <p className="text-xs text-gray-500">Dedicated assistance</p>
             </div>
           </div>
           <div className="flex items-center gap-4 p-4 transition-colors hover:bg-emerald-50/50 rounded-2xl group">
@@ -109,22 +114,27 @@ export default async function Home() {
             </div>
             <div>
               <h4 className="font-bold text-gray-900">Quality Items</h4>
-              <p className="text-xs text-gray-500">Top brands collection</p>
+              <p className="text-xs text-gray-500">Handpicked selection</p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* NEW: Intelligent Recommendations Section */}
+      <section className="container mx-auto px-4 mt-10 animate-reveal">
+        <Recommendations />
+      </section>
+
 
       {/* Categories Section */}
-      <section className="container mx-auto px-4 py-20">
+      <section className="container mx-auto px-4 py-20 animate-reveal" style={{ animationDelay: '200ms' }}>
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <span className="text-emerald-600 font-bold uppercase tracking-widest text-sm mb-2 block">Our Categories</span>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900">BROWSE BY <span className="text-emerald-600">DEPARTMENT</span></h2>
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest text-sm mb-2 block">Shop by Collection</span>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-zinc-100 uppercase tracking-tight">Browse <span className="text-emerald-600 dark:text-emerald-400 ms-1">By Category</span></h2>
           </div>
           <Link href="/products" className="group flex items-center gap-2 text-gray-500 hover:text-emerald-600 font-bold transition-colors">
-            View All Categories <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
@@ -145,21 +155,21 @@ export default async function Home() {
 
 
       {/* Recommended Section */}
-      <section className="container mx-auto px-4 py-10">
+      <section className="container mx-auto px-4 py-10 animate-reveal" style={{ animationDelay: '400ms' }}>
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
-            <span className="text-emerald-600 font-bold uppercase tracking-widest text-sm mb-2 block">Special Picks</span>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900">POPULAR <span className="text-emerald-600">PRODUCTS</span></h2>
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest text-sm mb-2 block">Special Picks</span>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-zinc-100 uppercase tracking-tight">Popular <span className="text-emerald-600 dark:text-emerald-400 ms-1">Products</span></h2>
           </div>
           <p className="text-gray-500 max-w-md md:text-right">
-            Based on recent customer trends and ratings, these are the items people are loving right now.
+            A handpicked selection of our most loved items this week.
           </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {products.slice(0, 12).map((product) => (
+          {products.slice(0, 12).map((product, idx) => (
             <div key={product.id}>
-              <ProductCard product={product} />
+              <ProductCard product={product} priority={idx < 4} />
             </div>
           ))}
         </div>
@@ -167,7 +177,7 @@ export default async function Home() {
         <div className="mt-16 text-center">
           <Link href="/products">
             <Button size="lg" variant="outline" className="rounded-full px-12 h-14 text-lg border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all font-bold">
-              Explore Entire Catalog
+              Explore Full Catalog
             </Button>
           </Link>
         </div>

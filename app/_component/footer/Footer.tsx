@@ -1,134 +1,165 @@
+import React from 'react'
+import logo from '@/images/freshcart-logo.svg'
+import Image from 'next/image'
+import Link from 'next/link'
+import {
+    Facebook,
+    Twitter,
+    Instagram,
+    Linkedin,
+    Mail,
+    Phone,
+    MapPin,
+    ArrowRight,
+    ShieldCheck,
+    CreditCard,
+    Truck
+} from 'lucide-react'
 
-// import React from 'react'
-// import Image from 'next/image'
-// import Link from 'next/link'
-// import logo from '@/images/freshcart-logo.svg'
-// import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, ArrowRight } from 'lucide-react'
+export default function Footer() {
+    const currentYear = new Date().getFullYear();
 
-// export default function Footer() {
-//     return (
-//         <footer className="bg-emerald-950 text-white pt-20 pb-10">
-//             <div className="container mx-auto px-4">
-//                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-//                     {/* Brand Info */}
-//                     <div className="space-y-6">
-//                         <Link href="/" className="flex items-center gap-3">
-//                             <Image src={logo} alt="Logo" className="w-10 h-10 brightness-0 invert" />
-//                             <span className="text-2xl font-black tracking-tighter">FRESH<span className="text-emerald-400">CART</span></span>
-//                         </Link>
-//                         <p className="text-emerald-100/60 leading-relaxed">
-//                             Your premier destination for high-quality electronics, fashion, and daily essentials. We deliver excellence to your doorstep.
-//                         </p>
-//                         <div className="flex gap-4">
-//                             <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-emerald-500 transition-colors">
-//                                 <Facebook className="w-5 h-5" />
-//                             </a>
-//                             <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-emerald-500 transition-colors">
-//                                 <Twitter className="w-5 h-5" />
-//                             </a>
-//                             <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-emerald-500 transition-colors">
-//                                 <Instagram className="w-5 h-5" />
-//                             </a>
-//                             <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-emerald-500 transition-colors">
-//                                 <Youtube className="w-5 h-5" />
-//                             </a>
-//                         </div>
-//                     </div>
+    return (
+        <footer className="bg-[#111] dark:bg-zinc-950 text-white pt-20 pb-10 overflow-hidden relative transition-colors duration-500">
+            {/* Decorative background element */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
 
-//                     {/* Quick Links */}
-//                     <div>
-//                         <h4 className="text-lg font-bold mb-8 relative inline-block">
-//                             Quick Links
-//                             <span className="absolute bottom-0 left-0 w-8 h-1 bg-emerald-400 -mb-2"></span>
-//                         </h4>
-//                         <ul className="space-y-4">
-//                             <li><Link href="/" className="text-emerald-100/60 hover:text-emerald-400 transition-colors flex items-center gap-2 group"><ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -ml-6 group-hover:ml-0 transition-all" /> Home</Link></li>
-//                             <li><Link href="/products" className="text-emerald-100/60 hover:text-emerald-400 transition-colors flex items-center gap-2 group"><ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -ml-6 group-hover:ml-0 transition-all" /> Products</Link></li>
-//                             <li><Link href="/cart" className="text-emerald-100/60 hover:text-emerald-400 transition-colors flex items-center gap-2 group"><ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -ml-6 group-hover:ml-0 transition-all" /> Shopping Cart</Link></li>
-//                             <li><Link href="/allorders" className="text-emerald-100/60 hover:text-emerald-400 transition-colors flex items-center gap-2 group"><ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -ml-6 group-hover:ml-0 transition-all" /> Track Orders</Link></li>
-//                             <li><Link href="/brands" className="text-emerald-100/60 hover:text-emerald-400 transition-colors flex items-center gap-2 group"><ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -ml-6 group-hover:ml-0 transition-all" /> Top Brands</Link></li>
-//                         </ul>
-//                     </div>
+            <div className="container mx-auto px-4 md:px-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
 
-//                     {/* Contact Info */}
-//                     <div>
-//                         <h4 className="text-lg font-bold mb-8 relative inline-block">
-//                             Support
-//                             <span className="absolute bottom-0 left-0 w-8 h-1 bg-emerald-400 -mb-2"></span>
-//                         </h4>
-//                         <ul className="space-y-4">
-//                             <li className="flex items-start gap-4 text-emerald-100/60">
-//                                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
-//                                     <Phone className="w-5 h-5 text-emerald-400" />
-//                                 </div>
-//                                 <div>
-//                                     <p className="text-sm font-bold text-white">Call Us</p>
-//                                     <p>+20 123 456 7890</p>
-//                                 </div>
-//                             </li>
-//                             <li className="flex items-start gap-4 text-emerald-100/60">
-//                                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
-//                                     <Mail className="w-5 h-5 text-emerald-400" />
-//                                 </div>
-//                                 <div>
-//                                     <p className="text-sm font-bold text-white">Email Us</p>
-//                                     <p>support@freshcart.com</p>
-//                                 </div>
-//                             </li>
-//                             <li className="flex items-start gap-4 text-emerald-100/60">
-//                                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
-//                                     <MapPin className="w-5 h-5 text-emerald-400" />
-//                                 </div>
-//                                 <div>
-//                                     <p className="text-sm font-bold text-white">Visit Us</p>
-//                                     <p>123 Shopping St, Cairo, EG</p>
-//                                 </div>
-//                             </li>
-//                         </ul>
-//                     </div>
+                    {/* Brand Section */}
+                    <div className="space-y-6">
+                        <Link href="/" className="flex items-center gap-3 group">
+                            <div className="bg-white dark:bg-emerald-500 p-2 rounded-2xl shadow-xl transition-transform duration-500 group-hover:rotate-12">
+                                <Image src={logo} alt="FreshCart Logo" className="w-8 h-8 dark:invert" />
+                            </div>
+                            <span className="font-black text-2xl tracking-tighter">
+                                FRESH<span className="text-emerald-500">CART</span>
+                            </span>
+                        </Link>
+                        <p className="text-gray-400 text-sm leading-relaxed font-medium">
+                            Elevating your shopping experience with premium curated products, fast global delivery, and 100% secure transactions. Join our community of savvy shoppers today.
+                        </p>
+                        <div className="flex items-center gap-4">
+                            <a href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all">
+                                <Facebook className="w-5 h-5" />
+                            </a>
+                            <a href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all">
+                                <Twitter className="w-5 h-5" />
+                            </a>
+                            <a href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all">
+                                <Instagram className="w-5 h-5" />
+                            </a>
+                            <a href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:bg-emerald-600 hover:text-white transition-all">
+                                <Linkedin className="w-5 h-5" />
+                            </a>
+                        </div>
+                    </div>
 
-//                     {/* Newsletter */}
-//                     <div>
-//                         <h4 className="text-lg font-bold mb-8 relative inline-block">
-//                             App Links
-//                             <span className="absolute bottom-0 left-0 w-8 h-1 bg-emerald-400 -mb-2"></span>
-//                         </h4>
-//                         <p className="text-emerald-100/60 mb-6">Download our mobile app for better experience and exclusive deals.</p>
-//                         <div className="space-y-3">
-//                             <div className="p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-4 hover:bg-white/10 transition-colors cursor-pointer group">
-//                                 <div className="w-10 h-10 bg-emerald-400 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-//                                     <Image src={logo} alt="Logo" className="w-6 h-6" />
-//                                 </div>
-//                                 <div className="text-xs">
-//                                     <p className="opacity-60 uppercase font-black tracking-widest">Get it on</p>
-//                                     <p className="text-lg font-black tracking-tight">Google Play</p>
-//                                 </div>
-//                             </div>
-//                             <div className="p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-4 hover:bg-white/10 transition-colors cursor-pointer group">
-//                                 <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-//                                     <Image src={logo} alt="Logo" className="w-6 h-6" />
-//                                 </div>
-//                                 <div className="text-xs">
-//                                     <p className="opacity-60 uppercase font-black tracking-widest">Download on the</p>
-//                                     <p className="text-lg font-black tracking-tight">App Store</p>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
+                    {/* Quick Links */}
+                    <div>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-8">Shop Selection</h4>
+                        <ul className="space-y-4">
+                            {['All Products', 'Featured Categories', 'Limited Offers', 'New Arrivals', 'Best Sellers'].map((item) => (
+                                <li key={item}>
+                                    <Link href="/products" className="text-sm font-bold text-gray-400 hover:text-white hover:translate-x-2 transition-all flex items-center gap-2 group">
+                                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-emerald-500" />
+                                        {item}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
 
-//                 {/* Bottom Bar */}
-//                 <div className="pt-10 border-t border-emerald-900 flex flex-col md:flex-row justify-between items-center gap-6">
-//                     <p className="text-emerald-100/40 text-sm">
-//                         © 2026 FreshCart Ecommerce. All rights reserved. Developed with ❤️ for quality shopping.
-//                     </p>
-//                     <div className="flex gap-8 text-emerald-100/40 text-sm">
-//                         <a href="#" className="hover:text-emerald-400 transition-colors">Privacy Policy</a>
-//                         <a href="#" className="hover:text-emerald-400 transition-colors">Terms of Service</a>
-//                         <a href="#" className="hover:text-emerald-400 transition-colors">Cookies</a>
-//                     </div>
-//                 </div>
-//             </div>
-//         </footer>
-//     )
-// }
+                    {/* Company Section */}
+                    <div>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-8">Customer Care</h4>
+                        <ul className="space-y-4">
+                            {['Terms of Service', 'Privacy Policy', 'Shipping Guide', 'Easy Returns', 'Help Center'].map((item) => (
+                                <li key={item}>
+                                    <Link href="#" className="text-sm font-bold text-gray-400 hover:text-white hover:translate-x-2 transition-all flex items-center gap-2 group">
+                                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-emerald-500" />
+                                        {item}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Newsletter / Contact Section */}
+                    <div className="space-y-8">
+                        <div>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-6">Stay Inspired</h4>
+                            <div className="relative group">
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-12 text-sm text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-emerald-500 outline-none transition-all"
+                                />
+                                <button className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-600/20">
+                                    <Mail className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-4 text-gray-400">
+                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-emerald-500">
+                                    <Phone className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">Call Support</p>
+                                    <p className="text-sm font-bold text-white">+20 0127 141 0168</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4 text-gray-400">
+                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-emerald-500">
+                                    <MapPin className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">Main Office</p>
+                                    <p className="text-sm font-bold text-white">Cairo, Egypt</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Middle Bar: Trust Indicators */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-10 border-y border-white/5">
+                    <div className="flex items-center gap-3 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700 cursor-default">
+                        <ShieldCheck className="w-6 h-6 text-emerald-500" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Authentic Products</span>
+                    </div>
+                    <div className="flex items-center gap-3 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700 cursor-default">
+                        <Truck className="w-6 h-6 text-emerald-500" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Global Shipping</span>
+                    </div>
+                    <div className="flex items-center gap-3 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700 cursor-default">
+                        <CreditCard className="w-6 h-6 text-emerald-500" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Secure Payments</span>
+                    </div>
+                    <div className="flex items-center gap-3 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700 cursor-default">
+                        <ArrowRight className="w-6 h-6 text-emerald-500" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">30-Day Returns</span>
+                    </div>
+                </div>
+
+                {/* Bottom Section */}
+                <div className="pt-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">
+                        © {currentYear} <span className="text-white">FreshCart</span>. Engineered by Premium Devs.
+                    </p>
+
+                    <div className="flex items-center gap-6 opacity-30">
+                        {/* These would ideally be svgs of payment brands */}
+                        <div className="text-[9px] font-black border border-white/20 px-3 py-1 rounded">VISA</div>
+                        <div className="text-[9px] font-black border border-white/20 px-3 py-1 rounded">STRIPE</div>
+                        <div className="text-[9px] font-black border border-white/20 px-3 py-1 rounded">MASTERCARD</div>
+                        <div className="text-[9px] font-black border border-white/20 px-3 py-1 rounded">AMEX</div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    )
+}

@@ -1,0 +1,54 @@
+Starting installation... 
+
+up to date, audited 597 packages in 3s
+
+159 packages are looking for funding
+  run `npm fund` for details
+
+2 high severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+bcryptjs done. 
+
+up to date, audited 597 packages in 4s
+
+159 packages are looking for funding
+  run `npm fund` for details
+
+2 high severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+@prisma/client done. 
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v6.19.2) to .\node_modules\@prisma\client in 114ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+prisma generate done. 
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": MongoDB database "MyFreshCart" at "cluster0.bkvpw3x.mongodb.net"
+Error: MongoDB error
+Kind: SCRAM failure: no password supplied, labels: {}, source: None
+   0: schema_commands::commands::schema_push::Calculate from database
+             at schema-engine\commands\src\commands\schema_push.rs:40
+   1: schema_core::state::SchemaPush
+             at schema-engine\core\src\state.rs:545
+
+All done. 

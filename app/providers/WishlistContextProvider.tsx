@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { getUserWishlist, addToWishlist, removeFromWishlist } from '../_actions/wishlistAction'
 import { toast } from 'sonner'
 import { useSession } from 'next-auth/react'
+import axios from 'axios'
 
 type WishlistContextType = {
     wishlistIds: string[];
@@ -18,10 +19,11 @@ export default function WishlistContextProvider({ children }: { children: React.
     const [wishlistIds, setWishlistIds] = useState<string[]>([])
     const [wishlistItems, setWishlistItems] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
-    const { status } = useSession()
+    const { data: session } = useSession()
+    const isAuthenticated = !!session
 
     async function fetchWishlist() {
-        if (status !== 'authenticated') return;
+        if (!isAuthenticated) return;
 
         const result = await getUserWishlist()
         if (result.success && result.data) {
@@ -32,12 +34,12 @@ export default function WishlistContextProvider({ children }: { children: React.
 
     useEffect(() => {
         fetchWishlist()
-    }, [status])
+    }, [isAuthenticated])
 
     const isInWishlist = (productId: string) => wishlistIds.includes(productId)
 
     const toggleWishlist = async (productId: string) => {
-        if (status !== 'authenticated') {
+        if (!isAuthenticated) {
             toast.error("Please login to manage your wishlist")
             return
         }
@@ -62,6 +64,10 @@ export default function WishlistContextProvider({ children }: { children: React.
             if (result.success) {
                 toast.success("Added to wishlist")
                 fetchWishlist()
+                // Track behavior
+                try {
+                    axios.post('/api/activity', { productId, action: 'WISHLIST' });
+                } catch (e) { /* silent */ }
             } else {
                 setWishlistIds(prev => prev.filter(id => id !== productId))
                 toast.error(result.message)

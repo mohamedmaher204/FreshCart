@@ -1,14 +1,14 @@
 "use server";
 
 import axios from "axios";
-import { loginSchema } from "../_Schema/loginSchema";
+import { LoginInput } from "../_lib/validations";
 
 type LoginResponse =
   | { success: true; message: string; token: string; user: any }
   | { success: false; message: string };
 
 export async function loginAction(
-  userData: loginSchema
+  userData: LoginInput
 ): Promise<LoginResponse> {
   try {
     const { data } = await axios.post(

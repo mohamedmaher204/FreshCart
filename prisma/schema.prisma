@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  password      String
+  phone         String?
+  role          String    @default("user") // user, admin
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  orders        Order[]
+  activities    UserActivity[]
+  cart          Cart?
+}
+
+model Product {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  title              String
+  description        String
+  price              Float
+  priceAfterDiscount Float?
+  imageCover         String
+  images             String[]
+  category           String    // We can make this an enum or separate model later
+  brand              String
+  ratingsAverage     Float     @default(4.5)
+  ratingsQuantity    Int       @default(0)
+  quantity           Int       @default(10)
+  sold               Int       @default(0)
+  createdAt          DateTime  @default(now())
+  
+  activities         UserActivity[]
+}
+
+model Order {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String    @db.ObjectId
+  user            User      @relation(fields: [userId], references: [id])
+  items           Json      // Array of products at time of purchase
+  totalPrice      Float
+  paymentMethod   String    @default("cash")
+  isPaid          Boolean   @default(false)
+  isDelivered     Boolean   @default(false)
+  shippingAddress Json
+  createdAt       DateTime  @default(now())
+}
+
+model Cart {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  items     Json     @default("[]")  // Array of { productId, quantity, product }
+  updatedAt DateTime @updatedAt
+}
+
+model UserActivity {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+  productId String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id])
+  action    String   // VIEW, ADD_TO_CART, PURCHASE
+  weight    Int      // 1 for VIEW, 3 for CART, 5 for PURCHASE
+  timestamp DateTime @default(now())
+}

@@ -1,12 +1,13 @@
 "use server"
-import axios from "axios"
-import { getUserToken } from "@/lib/getUserToken"
+import { prisma } from "@/app/_lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/_lib/authOptions";
 
 export async function getUserOrders() {
     try {
-        const token = await getUserToken()
+        const session = await getServerSession(authOptions);
 
-        if (!token) {
+        if (!session || !session.user) {
             return {
                 success: false,
                 message: "User not authenticated",
@@ -14,32 +15,46 @@ export async function getUserOrders() {
             }
         }
 
-        const response = await axios.get(
-            `https://ecommerce.routemisr.com/api/v1/orders/`,
-            {
-                headers: {
-                    token: token
+        const userId = (session.user as any).id;
+
+        const orders = await prisma.order.findMany({
+            where: { userId },
+            orderBy: { createdAt: "desc" }
+        });
+
+        // Map data to match UI expectations
+        const mappedOrders = orders.map(order => ({
+            _id: order.id,
+            totalOrderPrice: order.totalPrice,
+            paymentMethodType: order.paymentMethod,
+            isPaid: order.isPaid,
+            isDelivered: order.isDelivered,
+            createdAt: order.createdAt.toISOString(),
+            shippingAddress: order.shippingAddress,
+            cartItems: (order.items as any[]).map(item => ({
+                _id: item.id || item.productId,
+                count: item.quantity,
+                price: item.product?.price || 0,
+                product: {
+                    _id: item.productId,
+                    title: item.product?.title || "Product",
+                    imageCover: item.product?.imageCover || "",
+                    brand: { name: item.product?.brand || "Brand" },
+                    category: { name: item.product?.category || "Category" }
                 }
-            }
-        )
-
-        console.log("Orders API Response:", response.data)
-
-        // The API might return data directly as array or wrapped in an object
-        // Handle both cases
-        const ordersData = Array.isArray(response.data)
-            ? response.data
-            : response.data.data || response.data.orders || []
+            }))
+        }));
 
         return {
             success: true,
-            data: ordersData
+            data: mappedOrders
         }
+
     } catch (error: any) {
-        console.error("Error fetching orders:", error.response?.data || error.message)
+        console.error("Error fetching orders:", error.message);
         return {
             success: false,
-            message: error.response?.data?.message || "Failed to fetch orders",
+            message: "Failed to fetch orders",
             data: []
         }
     }

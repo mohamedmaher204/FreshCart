@@ -18,6 +18,9 @@ type MySliderType = {
   breakpoints?: any;
 }
 
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+
 export default function MySlider({
   children,
   imageUrls,
@@ -29,20 +32,21 @@ export default function MySlider({
   breakpoints
 }: MySliderType) {
 
+  const [swiperInstance, setSwiperInstance] = useState<any>(null);
   const modules = [Autoplay, Navigation, Pagination];
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div className={`relative w-full group/slider ${className}`}>
       <Swiper
         modules={modules}
         loop={loop}
         autoplay={autoplay ? { delay: 3000, disableOnInteraction: false } : false}
         spaceBetween={spaceBetween}
         slidesPerView={slidesPerView}
-        navigation={true}
+        onSwiper={(swiper) => setSwiperInstance(swiper)}
         pagination={{ clickable: true }}
         breakpoints={breakpoints}
-        className="mySwiper group rounded-2xl overflow-hidden"
+        className="mySwiper rounded-2xl overflow-hidden"
       >
         {imageUrls ? (
           imageUrls.map((url, index) => (
@@ -65,31 +69,25 @@ export default function MySlider({
         )}
       </Swiper>
 
+      {/* Premium Custom Navigation */}
+      <button
+        onClick={() => swiperInstance?.slidePrev()}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center text-emerald-600 opacity-0 group-hover/slider:opacity-100 transition-all duration-500 hover:bg-emerald-600 hover:text-white -translate-x-4 group-hover/slider:translate-x-0"
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
+      <button
+        onClick={() => swiperInstance?.slideNext()}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center text-emerald-600 opacity-0 group-hover/slider:opacity-100 transition-all duration-500 hover:bg-emerald-600 hover:text-white translate-x-4 group-hover/slider:translate-x-0"
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
+
       <style jsx global>{`
-        .swiper-button-next, .swiper-button-prev {
-          color: white !important;
-          background: rgba(16, 185, 129, 0.4);
-          backdrop-filter: blur(4px);
-          width: 45px !important;
-          height: 45px !important;
-          border-radius: 50%;
-          transition: all 0.3s ease;
-          opacity: 0;
-        }
-        .mySwiper:hover .swiper-button-next, .mySwiper:hover .swiper-button-prev {
-          opacity: 1;
-        }
-        .swiper-button-next:after, .swiper-button-prev:after {
-          font-size: 18px !important;
-          font-weight: bold;
-        }
-        .swiper-button-next:hover, .swiper-button-prev:hover {
-          background: rgba(16, 185, 129, 0.9);
-          scale: 1.1;
-        }
         .swiper-pagination-bullet {
           background: white !important;
           opacity: 0.5;
+          transition: all 0.3s ease;
         }
         .swiper-pagination-bullet-active {
           background: #10b981 !important;

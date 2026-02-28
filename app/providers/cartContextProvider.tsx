@@ -1,31 +1,32 @@
 "use client"
 import React, { createContext, useEffect, useState } from 'react'
-import { getUserCart } from '../_actions/getUserCartAction';
-export const cartContext = createContext<any>(null);
-export default function CartContextProvider({ children }: { children: React.ReactNode }) {
+import axios from 'axios'
+import { useSession } from 'next-auth/react'
 
+export const cartContext = createContext<any>(null);
+
+export default function CartContextProvider({ children }: { children: React.ReactNode }) {
+    const { status } = useSession()
     const [products, setProducts] = useState(null)
     const [numOfCartItems, setNumOfCartItems] = useState(0)
-    // const [totalPrice, setTotalPrice] = useState(0)
     const [cartId, setCartId] = useState(null)
 
-
-
-    //    await getUserCart()
-
     async function getData() {
+        if (status !== 'authenticated') return;
+
         try {
-            const userCart = await getUserCart()
+            const { data: response } = await axios.get("/api/cart");
+            const userCart = response.data;
+
             console.log("useCartFromContext", userCart);
 
-            // Only update state if we got valid cart data
-            if (userCart && userCart.status !== "fail") {
-                setNumOfCartItems(userCart.numOfCartItems || 0)
-                setCartId(userCart.cartId || null)
-                setProducts(userCart.data?.products || [])
+            if (userCart) {
+                // Calculate item count from items array
+                const itemCount = userCart.items?.reduce((acc: number, item: any) => acc + item.quantity, 0) || 0;
+                setNumOfCartItems(itemCount);
+                setCartId(userCart.id || null);
+                setProducts(userCart.items || []);
             }
-            // If userCart is null (error occurred), keep existing state
-            // This prevents clearing cart on temporary errors
         } catch (error) {
             console.error("Error fetching cart data:", error);
             // Don't clear cart on error - keep existing state
@@ -34,7 +35,7 @@ export default function CartContextProvider({ children }: { children: React.Reac
 
     useEffect(() => {
         getData()
-    }, [])
+    }, [status])
 
     return <cartContext.Provider value={{ products, numOfCartItems, cartId, setNumOfCartItems, getData, setProducts, setCartId }}>
         {children}

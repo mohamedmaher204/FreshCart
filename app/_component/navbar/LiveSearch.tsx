@@ -41,10 +41,14 @@ export default function LiveSearch() {
         if (query.trim().length > 1) {
             setIsLoading(true)
             const timer = setTimeout(() => {
-                const filtered = allProducts.filter(product =>
-                    product.title.toLowerCase().includes(query.toLowerCase()) ||
-                    product.category.name.toLowerCase().includes(query.toLowerCase())
-                ).slice(0, 6) // Limit to 6 results
+                const filtered = allProducts.filter(product => {
+                    const titleMatch = product.title?.toLowerCase().includes(query.toLowerCase());
+                    // Handling both nested object (external API style) and string (local DB style)
+                    const categoryName = typeof product.category === 'object' ? (product.category as any)?.name : product.category;
+                    const categoryMatch = categoryName?.toLowerCase().includes(query.toLowerCase());
+
+                    return titleMatch || categoryMatch;
+                }).slice(0, 6) // Limit to 6 results
                 setResults(filtered)
                 setIsLoading(false)
                 setIsOpen(true)
@@ -86,7 +90,7 @@ export default function LiveSearch() {
 
             {/* Results Dropdown */}
             {isOpen && (
-                <div className='absolute top-full mt-3 left-0 right-0 bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 z-[100] max-h-[450px] overflow-y-auto'>
+                <div className='absolute top-full mt-3 left-0 right-0 bg-white dark:bg-zinc-900 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 z-[100] max-h-[450px] overflow-y-auto'>
                     <div className='p-2'>
                         {isLoading ? (
                             <div className='flex flex-col items-center justify-center py-10 gap-3'>
@@ -95,17 +99,17 @@ export default function LiveSearch() {
                             </div>
                         ) : results.length > 0 ? (
                             <div className='flex flex-col'>
-                                <div className='px-4 py-2 border-b border-gray-50 flex items-center justify-between'>
-                                    <span className='text-[10px] font-black text-emerald-600 uppercase tracking-widest'>Matching Results</span>
+                                <div className='px-4 py-2 border-b border-gray-50 dark:border-zinc-800 flex items-center justify-between'>
+                                    <span className='text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest'>Matching Results</span>
                                     <span className='text-[10px] font-bold text-gray-400'>{results.length} found</span>
                                 </div>
                                 {results.map((product) => (
                                     <button
                                         key={product.id}
                                         onClick={() => handleSelect(product.id)}
-                                        className='flex items-center gap-4 p-3 hover:bg-emerald-50/50 transition-all rounded-2xl text-left group'
+                                        className='flex items-center gap-4 p-3 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 transition-all rounded-2xl text-left group'
                                     >
-                                        <div className='relative w-14 h-14 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 group-hover:border-emerald-200 transition-colors'>
+                                        <div className='relative w-14 h-14 bg-gray-50 dark:bg-zinc-800/50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 dark:border-zinc-800 group-hover:border-emerald-200 dark:group-hover:border-emerald-700 transition-colors'>
                                             <Image
                                                 src={product.imageCover}
                                                 alt={product.title}
@@ -114,8 +118,10 @@ export default function LiveSearch() {
                                             />
                                         </div>
                                         <div className='flex-grow min-w-0'>
-                                            <h4 className='text-sm font-black text-gray-900 truncate group-hover:text-emerald-600 transition-colors'>{product.title}</h4>
-                                            <p className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1'>{product.category.name}</p>
+                                            <h4 className='text-sm font-black text-gray-900 dark:text-zinc-100 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors'>{product.title}</h4>
+                                            <p className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1'>
+                                                {typeof product.category === 'object' ? (product.category as any)?.name : product.category}
+                                            </p>
                                             <div className='flex items-center gap-2'>
                                                 <span className='text-sm font-black text-emerald-600'>EGP {product.priceAfterDiscount || product.price}</span>
                                                 {product.priceAfterDiscount && (
@@ -136,10 +142,10 @@ export default function LiveSearch() {
                             </div>
                         ) : (
                             <div className='flex flex-col items-center justify-center py-10 px-6 text-center gap-2'>
-                                <div className='w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mb-2'>
-                                    <Search className='w-6 h-6 text-gray-300' />
+                                <div className='w-12 h-12 bg-gray-50 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mb-2'>
+                                    <Search className='w-6 h-6 text-gray-300 dark:text-zinc-700' />
                                 </div>
-                                <h4 className='text-sm font-black text-gray-900'>No products found</h4>
+                                <h4 className='text-sm font-black text-gray-900 dark:text-zinc-100'>No products found</h4>
                                 <p className='text-xs text-gray-400 font-medium'>Adjust your search or try searching for a different category.</p>
                             </div>
                         )}

@@ -22,10 +22,10 @@ export default async function BrandsPage() {
     }
 
     return (
-        <main className="bg-[#fafafa] min-h-screen pb-20 pt-10">
+        <main className="bg-[#fafafa] dark:bg-zinc-950 min-h-screen pb-20 pt-10 animate-reveal transition-colors duration-500">
             {/* Header Section */}
             <div className="container mx-auto px-4 mb-16">
-                <div className="relative bg-emerald-600 rounded-[2.5rem] overflow-hidden p-12 lg:p-20 shadow-2xl shadow-emerald-200">
+                <div className="relative bg-emerald-600 rounded-[2.5rem] overflow-hidden p-12 lg:p-20 shadow-2xl shadow-emerald-200 dark:shadow-none">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-400/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
@@ -47,8 +47,8 @@ export default async function BrandsPage() {
             <section className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
                     <div>
-                        <h2 className="text-2xl font-black text-gray-900 mb-2">Featured Partners</h2>
-                        <p className="text-gray-500 font-medium">Browse through {brands.length} premium brands</p>
+                        <h2 className="text-2xl font-black text-gray-900 dark:text-zinc-100 mb-2">Featured Partners</h2>
+                        <p className="text-gray-500 dark:text-zinc-500 font-medium">Browse through {brands.length} premium brands</p>
                     </div>
 
                     {/* Search Bar (Static UI for now) */}
@@ -57,7 +57,7 @@ export default async function BrandsPage() {
                         <input
                             type="text"
                             placeholder="Find a brand..."
-                            className="w-full h-12 pl-12 pr-4 bg-white border border-gray-100 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none shadow-sm font-medium"
+                            className="w-full h-12 pl-12 pr-4 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none shadow-sm font-medium dark:text-zinc-100"
                         />
                     </div>
                 </div>
@@ -67,18 +67,18 @@ export default async function BrandsPage() {
                         <Link
                             key={brand._id}
                             href={`/products?brand=${brand._id}`}
-                            className="group bg-white rounded-3xl border border-gray-100 p-6 flex flex-col items-center justify-center aspect-square shadow-sm hover:shadow-2xl hover:shadow-emerald-900/5 hover:-translate-y-2 transition-all duration-500"
+                            className="group bg-white dark:bg-zinc-900 rounded-3xl border border-gray-100 dark:border-zinc-800 p-6 flex flex-col items-center justify-center aspect-square shadow-sm hover:shadow-2xl hover:shadow-emerald-900/5 dark:hover:shadow-none hover:-translate-y-2 transition-all duration-500"
                         >
-                            <div className="relative w-full h-full flex items-center justify-center p-2 mb-4 bg-gray-50/50 rounded-2xl group-hover:bg-white transition-colors duration-500 overflow-hidden">
+                            <div className="relative w-full h-full flex items-center justify-center p-2 mb-4 bg-gray-50/50 dark:bg-zinc-800/50 rounded-2xl group-hover:bg-white dark:group-hover:bg-zinc-800 transition-colors duration-500 overflow-hidden">
                                 <Image
                                     src={brand.image}
                                     alt={brand.name}
                                     width={150}
                                     height={150}
-                                    className="object-contain w-full h-full mix-blend-multiply opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+                                    className="object-contain w-full h-full mix-blend-multiply dark:mix-blend-normal opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 dark:invert"
                                 />
                             </div>
-                            <h3 className="font-bold text-gray-900 text-center text-sm truncate w-full px-2 group-hover:text-emerald-600 transition-colors">
+                            <h3 className="font-bold text-gray-900 dark:text-zinc-100 text-center text-sm truncate w-full px-2 group-hover:text-emerald-600 transition-colors">
                                 {brand.name}
                             </h3>
                             <div className="mt-2 text-[10px] font-bold text-emerald-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-1">
@@ -89,27 +89,27 @@ export default async function BrandsPage() {
                 </div>
 
                 {brands.length === 0 && (
-                    <div className="text-center py-20 bg-white rounded-[2.5rem] border border-dashed border-gray-200">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-50 rounded-2xl text-gray-400 mb-4">
+                    <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-dashed border-gray-200 dark:border-zinc-800">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-50 dark:bg-zinc-800 rounded-2xl text-gray-400 dark:text-zinc-600 mb-4">
                             <Search className="w-8 h-8" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">No Brands Found</h3>
-                        <p className="text-gray-500">We couldn't find any brands at the moment. Please try again later.</p>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-zinc-100 mb-2">No Brands Found</h3>
+                        <p className="text-gray-500 dark:text-zinc-500">We couldn't find any brands at the moment. Please try again later.</p>
                     </div>
                 )}
             </section>
 
             {/* CTA Section */}
             <div className="container mx-auto px-4 mt-32">
-                <div className="bg-gray-900 rounded-[3rem] p-12 text-center relative overflow-hidden">
+                <div className="bg-gray-900 dark:bg-zinc-900 rounded-[3rem] p-12 text-center relative overflow-hidden border dark:border-zinc-800">
                     <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,rgba(16,185,129,0.1)_0%,transparent_100%)]"></div>
                     <div className="relative z-10">
                         <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Can't find what you're looking for?</h2>
-                        <p className="text-gray-400 mb-8 max-w-xl mx-auto font-medium">
+                        <p className="text-gray-400 dark:text-zinc-500 mb-8 max-w-xl mx-auto font-medium">
                             Browse our full collection of products across all categories and brands.
                         </p>
                         <Link href="/products">
-                            <button className="h-14 px-10 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl shadow-xl shadow-emerald-500/20 transition-all active:scale-95 group">
+                            <button className="h-14 px-10 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl shadow-xl shadow-emerald-500/20 dark:shadow-none transition-all active:scale-95 group">
                                 Explore All Products <ArrowRight className="inline-block ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </button>
                         </Link>

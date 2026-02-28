@@ -1,49 +1,57 @@
 import { Producttype } from './../_types/Product.type';
 
 
- 
- 
 
 
 
 
 
- export async function getAllProduct(): Promise<Producttype[]|null> {
 
+
+const domain = process.env.NEXTAUTH_URL || "http://localhost:3000"; // Fallback for server-side
+
+export async function getAllProduct(): Promise<Producttype[] | null> {
     try {
-        const response = await fetch(`https://ecommerce.routemisr.com/api/v1/products`, {
-            cache: 'force-cache',
+        // Determine base URL based on environment
+        const baseUrl = typeof window === 'undefined' ? domain : '';
+
+        const response = await fetch(`${baseUrl}/api/products`, {
+            cache: 'no-store', // Ensure fresh data, or use 'next: { revalidate: ... }'
         });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch products: ${response.status}`);
+        }
+
         const data = await response.json();
-        console.log(data.data);
         return data.data;
     } catch (error) {
-        console.log("error", error);
+        console.log("Error fetching products:", error);
         return null;
     }
-    
-  
-  }
+}
 
- export async function getProduct(id: string): Promise<Producttype | null> {
-
+export async function getProduct(id: string): Promise<Producttype | null> {
     try {
-        const response = await fetch(`https://ecommerce.routemisr.com/api/v1/products/${id}`, {
-            cache: 'force-cache',
+        const baseUrl = typeof window === 'undefined' ? domain : '';
+
+        const response = await fetch(`${baseUrl}/api/products/${id}`, {
+            cache: 'no-store',
         });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch product: ${response.status}`);
+        }
+
         const data = await response.json();
-        console.log(data.data);
         return data.data;
     } catch (error) {
-        console.log("error", error);
+        console.log("Error fetching product details:", error);
         return null;
     }
-    
-  
-  }
+}
 
 
 
 
 
- 

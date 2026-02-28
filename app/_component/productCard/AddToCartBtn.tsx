@@ -7,6 +7,7 @@ import { Loader, ShoppingCart } from 'lucide-react'
 import { cartContext } from '@/app/providers/cartContextProvider'
 import React, { useContext, useState } from 'react'
 import { toast } from 'sonner'
+import { useTrackActivity } from '@/app/_hooks/useTrackActivity'
 type AddToCartBtnProps = {
   productId: string
 }
@@ -14,35 +15,29 @@ export default function AddToCartBtn({ productId }: AddToCartBtnProps) {
 
   const { data: session } = useSession();
   const { getData: refreshCart } = useContext(cartContext);
+  const { trackAction } = useTrackActivity();
   const [loading, setLoading] = useState(false);
 
   async function AddToCart() {
+    if (!session) {
+      toast.error("Please login to add products to cart", { position: "top-center" });
+      return;
+    }
+
     setLoading(true);
 
-    console.log("adding to cart", productId);
-    // @ts-ignore
-    const token = session?.user?.userTokenfromBackend;
-
-    // هنا ممكن تضيف منطق اضافة المنتج الى السلة
     try {
-      const { data } = await axios.post("https://ecommerce.routemisr.com/api/v1/cart", {
+      const { data } = await axios.post("/api/cart", {
         productId
-      },
+      });
 
-        {
-          headers: {
-            token: token,
-          }
-        }
+      toast.success("Product added to cart successfully", { position: "top-center" })
+      refreshCart(); // Refresh cart data
+      trackAction(productId, 'ADD_TO_CART'); // Track behavior
 
-      )
-      console.log("response from add to cart", data);
-      if (data.status === "success") {
-        toast.success("Product added to cart successfully", { position: "top-center" })
-        refreshCart(); // Refresh cart data
-      }
-    } catch (error) {
-      toast.error("Failed to add product to cart");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Failed to add product to cart";
+      toast.error(message);
       console.error(error);
     }
     setLoading(false);

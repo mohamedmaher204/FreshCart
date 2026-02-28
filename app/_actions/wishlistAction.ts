@@ -1,51 +1,111 @@
 "use server"
-import axios from "axios"
-import { getUserToken } from "@/lib/getUserToken"
-import { revalidatePath } from "next/cache"
+import { prisma } from "@/app/_lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/_lib/authOptions";
+import { revalidatePath } from "next/cache";
+import { wishlistSchema } from "../_lib/validations";
 
-const BASE_URL = "https://ecommerce.routemisr.com/api/v1/wishlist"
-
+// Add to Wishlist
 export async function addToWishlist(productId: string) {
-    const token = await getUserToken()
-    if (!token) return { success: false, message: "Please login first" }
-
     try {
-        const { data } = await axios.post(
-            BASE_URL,
-            { productId },
-            { headers: { token } }
-        )
-        revalidatePath("/")
-        return { success: true, data }
+        const validation = wishlistSchema.safeParse({ productId });
+        if (!validation.success) {
+            return { success: false, message: validation.error.issues[0].message };
+        }
+
+        const session = await getServerSession(authOptions);
+
+        if (!session || !session.user) {
+            return { success: false, message: "Please login first (Session not found)" };
+        }
+
+        const userId = (session.user as any).id;
+
+        // Ensure we don't have duplicates
+        await prisma.userActivity.deleteMany({
+            where: {
+                userId,
+                productId,
+                action: "FAVORITE"
+            }
+        });
+
+        // Create new record
+        await prisma.userActivity.create({
+            data: {
+                userId,
+                productId,
+                action: "FAVORITE",
+                weight: 4
+            }
+        });
+
+        revalidatePath("/");
+        return { success: true, message: "Added to wishlist" };
     } catch (error: any) {
-        return { success: false, message: error.response?.data?.message || "Failed to add to wishlist" }
+        console.error("Add to Wishlist error:", error);
+        return { success: false, message: "Failed to add to wishlist" };
     }
 }
 
+// Remove from Wishlist
 export async function removeFromWishlist(productId: string) {
-    const token = await getUserToken()
-    if (!token) return { success: false, message: "Please login first" }
-
     try {
-        const { data } = await axios.delete(
-            `${BASE_URL}/${productId}`,
-            { headers: { token } }
-        )
-        revalidatePath("/")
-        return { success: true, data }
+        const validation = wishlistSchema.safeParse({ productId });
+        if (!validation.success) {
+            return { success: false, message: validation.error.issues[0].message };
+        }
+
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user) {
+            return { success: false, message: "Please login first" };
+        }
+
+        const userId = (session.user as any).id;
+
+        // Delete the activity record
+        await prisma.userActivity.deleteMany({
+            where: {
+                userId,
+                productId,
+                action: "FAVORITE"
+            }
+        });
+
+        revalidatePath("/");
+        return { success: true, message: "Removed from wishlist" };
     } catch (error: any) {
-        return { success: false, message: error.response?.data?.message || "Failed to remove from wishlist" }
+        console.error("Remove from Wishlist error:", error);
+        return { success: false, message: "Failed to remove from wishlist" };
     }
 }
 
+// Get User Wishlist
 export async function getUserWishlist() {
-    const token = await getUserToken()
-    if (!token) return { success: false, message: "Please login first" }
-
     try {
-        const { data } = await axios.get(BASE_URL, { headers: { token } })
-        return { success: true, data: data.data }
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user) {
+            return { success: false, message: "Please login first", data: [] };
+        }
+
+        const userId = (session.user as any).id;
+
+        const activities = await prisma.userActivity.findMany({
+            where: {
+                userId,
+                action: "FAVORITE"
+            },
+            include: {
+                product: true
+            },
+            orderBy: { timestamp: "desc" }
+        });
+
+        const wishlist = activities.map(activity => activity.product);
+
+        return { success: true, data: wishlist };
     } catch (error: any) {
-        return { success: false, message: error.response?.data?.message || "Failed to fetch wishlist", data: [] }
+        console.error("Fetch Wishlist error:", error);
+        return { success: false, message: "Failed to fetch wishlist", data: [] };
     }
 }
