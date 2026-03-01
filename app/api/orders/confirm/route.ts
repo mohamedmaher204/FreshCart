@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/app/_lib/prisma";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const sessionId = searchParams.get("session_id");
@@ -13,6 +11,12 @@ export async function GET(req: Request) {
     }
 
     try {
+        if (!process.env.STRIPE_SECRET_KEY) {
+            return NextResponse.json({ message: "Stripe configuration missing" }, { status: 500 });
+        }
+
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
         // 1. Retrieve the session from Stripe
         const stripeSession = await stripe.checkout.sessions.retrieve(sessionId);
 

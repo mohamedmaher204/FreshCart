@@ -5,10 +5,13 @@ import { authOptions } from "@/app/_lib/authOptions";
 import { shippingAddressSchema } from "@/app/_lib/validations";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-
 export async function POST(req: Request) {
     try {
+        if (!process.env.STRIPE_SECRET_KEY) {
+            return NextResponse.json({ message: "Stripe configuration missing" }, { status: 500 });
+        }
+
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
         const session = await getServerSession(authOptions);
 
         if (!session || !session.user) {
