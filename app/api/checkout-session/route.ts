@@ -44,20 +44,29 @@ export async function POST(req: Request) {
         const cartItems = cart.items as any[];
 
         // 2. Prepare Stripe line items
-        const line_items = cartItems.map((item: any) => ({
-            price_data: {
-                currency: "egp",
-                product_data: {
-                    name: item.product.title,
-                    images: [item.product.imageCover],
-                    metadata: {
-                        productId: item.productId
-                    }
+        const line_items = cartItems.map((item: any) => {
+            const productData: any = {
+                name: item.product.title || "Product",
+                metadata: {
+                    productId: item.productId
+                }
+            };
+
+            // Only add image if it's a valid absolute HTTPS URL (Stripe requirement)
+            const imageUrl = item.product?.imageCover;
+            if (imageUrl && typeof imageUrl === "string" && imageUrl.startsWith("https://")) {
+                productData.images = [imageUrl];
+            }
+
+            return {
+                price_data: {
+                    currency: "egp",
+                    product_data: productData,
+                    unit_amount: Math.round((item.product?.price || 0) * 100), // Stripe expects amounts in cents
                 },
-                unit_amount: item.product.price * 100, // Stripe expects amounts in cents
-            },
-            quantity: item.quantity,
-        }));
+                quantity: item.quantity,
+            };
+        });
 
         // 3. Create Stripe Checkout Session
         const stripeSession = await stripe.checkout.sessions.create({
