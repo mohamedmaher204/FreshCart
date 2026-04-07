@@ -33,10 +33,10 @@ model Product {
   images             String[]
   category           String    // We can make this an enum or separate model later
   brand              String
-  ratingsAverage     Float     @default(4.5)
-  ratingsQuantity    Int       @default(0)
+  ratingsAverage     Float?    @default(4.5)
+  ratingsQuantity    Int?      @default(0)
   quantity           Int       @default(10)
-  sold               Int       @default(0)
+  sold               Int?      @default(0)
   createdAt          DateTime  @default(now())
   
   activities         UserActivity[]

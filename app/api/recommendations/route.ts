@@ -7,19 +7,17 @@ export async function GET() {
     try {
         const session = await getServerSession(authOptions);
 
-        // If not logged in, return top-selling products as a fallback
+        // If not logged in, return top-rated products as a fallback
         if (!session || !session.user) {
             const topProducts = await prisma.product.findMany({
                 take: 10,
-                orderBy: { sold: 'desc' }
+                orderBy: { ratingsAverage: 'desc' } // Removed orderBy: sold to prevent Prisma crash on old missing documents
             });
             return NextResponse.json({ data: topProducts });
         }
 
         const userId = (session.user as any).id;
 
-        // HEURISTIC RECOMMENDATION ENGINE LOGIC:
-        // 1. Get recent user activity
         const recentActivity = await prisma.userActivity.findMany({
             where: { userId },
             take: 20,
@@ -27,13 +25,11 @@ export async function GET() {
             select: { productId: true, action: true, weight: true }
         });
 
-        // 2. Score products based on interaction weights
         const scores: Record<string, number> = {};
         recentActivity.forEach(activity => {
             scores[activity.productId] = (scores[activity.productId] || 0) + activity.weight;
         });
 
-        // 3. Get categories the user is interested in (based on high-scored products)
         const topProductIds = Object.keys(scores).sort((a, b) => scores[b] - scores[a]).slice(0, 5);
 
         const topProducts = await prisma.product.findMany({
@@ -43,21 +39,15 @@ export async function GET() {
 
         const interestingCategories = [...new Set(topProducts.map(p => p.category))];
 
-        // 4. Fetch recommendations
-        // Logic: Products from interesting categories that the user hasn't bought/viewed much yet
         const recommendedProducts = await prisma.product.findMany({
             where: {
                 category: { in: interestingCategories },
-                id: { notIn: topProductIds } // Avoid repeating what they just saw
+                id: { notIn: topProductIds }
             },
             take: 10,
-            orderBy: [
-                { ratingsAverage: 'desc' },
-                { sold: 'desc' }
-            ]
+            orderBy: { ratingsAverage: 'desc' } // Removed orderBy sold
         });
 
-        // If not enough recommendations, fill with top rated
         if (recommendedProducts.length < 4) {
             const fallback = await prisma.product.findMany({
                 where: { id: { notIn: topProductIds } },
