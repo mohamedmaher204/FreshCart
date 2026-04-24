@@ -13,7 +13,7 @@ model User {
   email         String?   @unique
   password      String
   phone         String?
-  role          String    @default("user") // user, admin
+  role          String    @default("user")
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -30,8 +30,8 @@ model Product {
   price              Float
   priceAfterDiscount Float?
   imageCover         String
-  images             String[]
-  category           String    // We can make this an enum or separate model later
+  images             String[]  @default([])
+  category           String
   brand              String
   ratingsAverage     Float?    @default(4.5)
   ratingsQuantity    Int?      @default(0)
@@ -46,12 +46,12 @@ model Order {
   id              String    @id @default(auto()) @map("_id") @db.ObjectId
   userId          String    @db.ObjectId
   user            User      @relation(fields: [userId], references: [id])
-  items           Json      // Array of products at time of purchase
+  items           String    @default("[]")
   totalPrice      Float
   paymentMethod   String    @default("cash")
   isPaid          Boolean   @default(false)
   isDelivered     Boolean   @default(false)
-  shippingAddress Json
+  shippingAddress String    @default("{}")
   createdAt       DateTime  @default(now())
 }
 
@@ -59,7 +59,7 @@ model Cart {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @unique @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
-  items     Json     @default("[]")  // Array of { productId, quantity, product }
+  items     String   @default("[]")
   updatedAt DateTime @updatedAt
 }
 
@@ -69,7 +69,7 @@ model UserActivity {
   user      User?    @relation(fields: [userId], references: [id])
   productId String   @db.ObjectId
   product   Product  @relation(fields: [productId], references: [id])
-  action    String   // VIEW, ADD_TO_CART, PURCHASE
-  weight    Int      // 1 for VIEW, 3 for CART, 5 for PURCHASE
+  action    String
+  weight    Int
   timestamp DateTime @default(now())
 }

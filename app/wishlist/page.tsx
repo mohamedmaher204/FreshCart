@@ -17,7 +17,7 @@ export default function WishlistPage() {
     return (
         <section className="min-h-screen bg-[#fafafa] dark:bg-zinc-950 pb-24 transition-colors duration-500">
             {/* Premium Hero Header */}
-            <div className="relative bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 py-20 overflow-hidden mb-12">
+            <div className="relative bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-600 py-20 overflow-hidden mb-12">
                 <div className="absolute inset-0 opacity-25">
                     <div className="absolute top-0 -left-1/4 w-1/2 h-full bg-white rounded-full blur-[120px] animate-pulse"></div>
                     <div className="absolute bottom-0 -right-1/4 w-1/2 h-full bg-emerald-300 rounded-full blur-[120px] animate-pulse delay-700"></div>

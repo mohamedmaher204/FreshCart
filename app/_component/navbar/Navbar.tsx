@@ -53,17 +53,17 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`fixed left-0 right-0 z-[100] transition-all duration-700 ease-in-out ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+      <nav className={`fixed left-0 right-0 z-100 transition-all duration-700 ease-in-out ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
         } ${isScrolled
-          ? 'top-4 mx-auto w-[95%] md:w-[90%] max-w-[1400px] rounded-[2.5rem] py-2 px-6 bg-[#065f46]/80 dark:bg-zinc-900/80 backdrop-blur-2xl shadow-2xl border border-white/10'
-          : 'top-0 w-full py-5 px-4 md:px-12 bg-gradient-to-r from-[#059669] to-[#0d9488] dark:from-zinc-950 dark:to-zinc-900'
+          ? 'top-4 mx-auto w-[95%] md:w-[90%] max-w-350 rounded-[2.5rem] py-2 px-6 bg-[#065f46]/80 dark:bg-zinc-900/80 backdrop-blur-2xl shadow-2xl border border-white/10'
+          : 'top-0 w-full py-5 px-4 md:px-12 bg-linear-to-r from-[#059669] to-[#0d9488] dark:from-zinc-950 dark:to-zinc-900'
         }`}>
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8">
+        <div className="max-w-400 mx-auto flex items-center justify-between gap-4 md:gap-8">
 
           {/* Logo Section */}
           <Link
             href={'/'}
-            className='flex items-center gap-3 transition-all flex-shrink-0 group'
+            className='flex items-center gap-3 transition-all shrink-0 group'
           >
             <div className="bg-white dark:bg-emerald-500 p-2 rounded-2xl shadow-xl group-hover:rotate-12 transition-transform duration-500">
               <Image
@@ -78,7 +78,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <ul className='hidden xl:flex items-center gap-1 flex-shrink-0'>
+          <ul className='hidden xl:flex items-center gap-1 shrink-0'>
             {navLinks.map((link) => (
               <li key={link.href}>
                 <Link
@@ -95,7 +95,7 @@ export default function Navbar() {
           <LiveSearch />
 
           {/* Action Buttons Section */}
-          <div className='flex items-center gap-2 md:gap-3 flex-shrink-0'>
+          <div className='flex items-center gap-2 md:gap-3 shrink-0'>
 
             {/* Theme Toggle & Language Toggle - Desktop */}
             <div className="hidden md:flex items-center gap-1.5 p-1 bg-white/5 rounded-[1.4rem] border border-white/10">
@@ -135,7 +135,7 @@ export default function Navbar() {
                 </div>
               ) : session ? (
                 <div className="flex items-center gap-2">
-                  <div className="flex flex-col items-end hidden sm:flex">
+                  <div className="flex flex-col items-end sm:flex">
                     {(session.user as any).role === 'admin' && (
                       <Link href="/admin" className="text-[10px] text-amber-400 font-black uppercase tracking-[0.2em] mb-1 hover:text-amber-300 transition-colors">
                         Admin Suite
@@ -217,7 +217,7 @@ export default function Navbar() {
                     <Link
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className='flex items-center px-6 py-4 rounded-[1.25rem] font-black text-sm uppercase tracking-widest text-white/80 hover:text-white hover:bg-white/5 transition-all'
+                      className='flex items-center px-6 py-4 rounded-4xl font-black text-sm uppercase tracking-widest text-white/80 hover:text-white hover:bg-white/5 transition-all'
                     >
                       {link.label}
                     </Link>
@@ -231,7 +231,7 @@ export default function Navbar() {
                       setMobileMenuOpen(false);
                       setIsCartOpen(true);
                     }}
-                    className='w-full flex items-center justify-between px-6 py-4 rounded-[1.25rem] font-black text-sm uppercase tracking-widest text-white/80 hover:text-white hover:bg-white/5 transition-all'
+                    className='w-full flex items-center justify-between px-6 py-4 rounded-4xl font-black text-sm uppercase tracking-widest text-white/80 hover:text-white hover:bg-white/5 transition-all'
                   >
                     <span>My Cart</span>
                     {numOfCartItems > 0 && (
@@ -248,7 +248,7 @@ export default function Navbar() {
                     <Link
                       href="/profile"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-4 px-6 py-4 text-white font-black text-sm rounded-[1.25rem] hover:bg-white/5"
+                      className="flex items-center gap-4 px-6 py-4 text-white font-black text-sm rounded-4xl hover:bg-white/5"
                     >
                       <div className='w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden relative'>
                         {(session.user as any).image ? (
@@ -265,7 +265,7 @@ export default function Navbar() {
                     </Link>
                     <button
                       onClick={() => signOut()}
-                      className='w-full flex items-center gap-4 px-6 py-4 rounded-[1.25rem] font-black text-sm text-red-100 bg-red-500/10 hover:bg-red-500/20 transition-all mt-2'
+                      className='w-full flex items-center gap-4 px-6 py-4 rounded-4xl font-black text-sm text-red-100 bg-red-500/10 hover:bg-red-500/20 transition-all mt-2'
                     >
                       <div className='w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center'><LogOut className="w-5 h-5" /></div> Logout Session
                     </button>
@@ -273,10 +273,10 @@ export default function Navbar() {
                 ) : (
                   <div className="grid grid-cols-2 gap-4 p-2 mt-4">
                     <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full h-14 bg-transparent border-white/20 text-white hover:bg-white hover:text-emerald-700 rounded-[1.25rem] font-black uppercase tracking-widest text-xs">Login</Button>
+                      <Button variant="outline" className="w-full h-14 bg-transparent border-white/20 text-white hover:bg-white hover:text-emerald-700 rounded-4xl font-black uppercase tracking-widest text-xs">Login</Button>
                     </Link>
                     <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full h-14 bg-white text-emerald-700 hover:bg-emerald-50 rounded-[1.25rem] font-black uppercase tracking-widest text-xs border-0">Sign Up</Button>
+                      <Button className="w-full h-14 bg-white text-emerald-700 hover:bg-emerald-50 rounded-4xl font-black uppercase tracking-widest text-xs border-0">Sign Up</Button>
                     </Link>
                   </div>
                 )}

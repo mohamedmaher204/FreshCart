@@ -18,7 +18,11 @@ async function getOrderDetail(id: string) {
         // Fetch user manually
         const user = await prisma.user.findUnique({ where: { id: order.userId } });
 
-        return { ...order, user };
+        // Parse JSON strings to objects
+        const parsedItems = typeof order.items === 'string' ? JSON.parse(order.items || '[]') : (Array.isArray(order.items) ? order.items : []);
+        const parsedAddress = typeof order.shippingAddress === 'string' ? JSON.parse(order.shippingAddress || '{}') : (order.shippingAddress || {});
+
+        return { ...order, user, items: parsedItems, shippingAddress: parsedAddress };
     } catch (error) {
         console.error("Error fetching order detail:", error);
         return null;

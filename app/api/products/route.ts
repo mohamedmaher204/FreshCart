@@ -61,10 +61,14 @@ export async function GET(req: Request) {
             data: products
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error fetching products:", error);
         return NextResponse.json(
-            { message: "Internal server error" },
+            { 
+                message: "Internal server error", 
+                error: error.message,
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
+            },
             { status: 500 }
         );
     }
@@ -103,10 +107,13 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json({ data: product }, { status: 201 });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error creating product:", error);
         return NextResponse.json(
-            { message: "Internal server error" },
+            { 
+                message: "Internal server error", 
+                error: error.message 
+            },
             { status: 500 }
         );
     }

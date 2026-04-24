@@ -31,9 +31,11 @@ async function getOrders() {
 
         const userMap = new Map(users.map(u => [u.id, u]));
 
-        // Merge user data into each order
+        // Merge user data into each order and parse items
         return orders.map(order => ({
             ...order,
+            items: typeof order.items === 'string' ? JSON.parse(order.items || '[]') : (Array.isArray(order.items) ? order.items : []),
+            shippingAddress: typeof order.shippingAddress === 'string' ? JSON.parse(order.shippingAddress || '{}') : (order.shippingAddress || {}),
             user: userMap.get(order.userId) ?? null,
         }));
     } catch (error) {

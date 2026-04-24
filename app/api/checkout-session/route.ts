@@ -37,11 +37,15 @@ export async function POST(req: Request) {
             where: { userId }
         });
 
-        if (!cart || !Array.isArray(cart.items) || (cart.items as any[]).length === 0) {
-            return NextResponse.json({ message: "Cart is empty" }, { status: 400 });
+        if (!cart) {
+            return NextResponse.json({ message: "Cart not found" }, { status: 404 });
         }
 
-        const cartItems = cart.items as any[];
+        const cartItems = typeof cart.items === "string" ? JSON.parse(cart.items || "[]") : (Array.isArray(cart.items) ? cart.items : []);
+
+        if (cartItems.length === 0) {
+            return NextResponse.json({ message: "Cart is empty" }, { status: 400 });
+        }
 
         // 2. Prepare Stripe line items
         const line_items = cartItems.map((item: any) => {

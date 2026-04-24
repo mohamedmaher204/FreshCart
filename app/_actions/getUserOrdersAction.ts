@@ -23,27 +23,32 @@ export async function getUserOrders() {
         });
 
         // Map data to match UI expectations
-        const mappedOrders = orders.map(order => ({
-            _id: order.id,
-            totalOrderPrice: order.totalPrice,
-            paymentMethodType: order.paymentMethod,
-            isPaid: order.isPaid,
-            isDelivered: order.isDelivered,
-            createdAt: order.createdAt.toISOString(),
-            shippingAddress: order.shippingAddress,
-            cartItems: (order.items as any[]).map(item => ({
-                _id: item.id || item.productId,
-                count: item.quantity,
-                price: item.product?.price || 0,
-                product: {
-                    _id: item.productId,
-                    title: item.product?.title || "Product",
-                    imageCover: item.product?.imageCover || "",
-                    brand: { name: item.product?.brand || "Brand" },
-                    category: { name: item.product?.category || "Category" }
-                }
-            }))
-        }));
+        const mappedOrders = orders.map(order => {
+            const items = typeof order.items === 'string' ? JSON.parse(order.items || '[]') : (Array.isArray(order.items) ? order.items : []);
+            const address = typeof order.shippingAddress === 'string' ? JSON.parse(order.shippingAddress || '{}') : (order.shippingAddress || {});
+            
+            return {
+                _id: order.id,
+                totalOrderPrice: order.totalPrice,
+                paymentMethodType: order.paymentMethod,
+                isPaid: order.isPaid,
+                isDelivered: order.isDelivered,
+                createdAt: order.createdAt.toISOString(),
+                shippingAddress: address,
+                cartItems: items.map((item: any) => ({
+                    _id: item.id || item.productId,
+                    count: item.quantity,
+                    price: item.product?.price || 0,
+                    product: {
+                        _id: item.productId,
+                        title: item.product?.title || "Product",
+                        imageCover: item.product?.imageCover || "",
+                        brand: { name: item.product?.brand || "Brand" },
+                        category: { name: item.product?.category || "Category" }
+                    }
+                }))
+            };
+        });
 
         return {
             success: true,

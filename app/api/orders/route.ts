@@ -28,9 +28,9 @@ export async function GET() {
             isPaid: order.isPaid,
             isDelivered: order.isDelivered,
             createdAt: order.createdAt.toISOString(),
-            shippingAddress: order.shippingAddress,
+            shippingAddress: typeof order.shippingAddress === 'string' ? JSON.parse(order.shippingAddress || "{}") : (order.shippingAddress || {}),
             // Our items are stored as JSON in the schema
-            cartItems: (order.items as any[]).map(item => ({
+            cartItems: (typeof order.items === "string" ? JSON.parse(order.items || "[]") : (Array.isArray(order.items) ? order.items : [])).map((item: any) => ({
                 _id: item.id || item.productId,
                 count: item.quantity,
                 price: item.product?.price || 0,
@@ -80,11 +80,15 @@ export async function POST(req: Request) {
             where: { userId }
         });
 
-        if (!cart || !Array.isArray(cart.items) || (cart.items as any[]).length === 0) {
-            return NextResponse.json({ message: "Cart is empty" }, { status: 400 });
+        if (!cart) {
+            return NextResponse.json({ message: "Cart not found" }, { status: 404 });
         }
 
-        const cartItems = cart.items as any[];
+        const cartItems = typeof cart.items === "string" ? JSON.parse(cart.items || "[]") : (Array.isArray(cart.items) ? cart.items : []);
+
+        if (cartItems.length === 0) {
+            return NextResponse.json({ message: "Cart is empty" }, { status: 400 });
+        }
 
         // 2. Calculate total price
         const totalCartPrice = cartItems.reduce((acc: number, item: any) => acc + (item.product?.price * item.quantity), 0);
@@ -93,10 +97,10 @@ export async function POST(req: Request) {
         const order = await prisma.order.create({
             data: {
                 userId,
-                items: cartItems,
+                items: JSON.stringify(cartItems),
                 totalPrice: totalCartPrice,
                 paymentMethod,
-                shippingAddress,
+                shippingAddress: JSON.stringify(shippingAddress),
                 isPaid: paymentMethod === "online", // Simple logic: online is "paid" immediately for this demo
                 isDelivered: false
             }
@@ -126,7 +130,7 @@ export async function POST(req: Request) {
         // 6. Clear cart
         await prisma.cart.update({
             where: { userId },
-            data: { items: [] }
+            data: { items: JSON.stringify([]) }
         });
 
         return NextResponse.json({

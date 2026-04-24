@@ -22,57 +22,82 @@ export async function GET() {
 
         if (!cart) {
             cart = await prisma.cart.create({
-                data: { userId, items: [] }
+                data: { userId, items: JSON.stringify([]) }
             });
         }
 
         // --- Data Migration / Consistency Check ---
-        let items = Array.isArray(cart.items) ? [...(cart.items as any[])] : [];
+        let items: any[] = [];
+        try {
+            if (typeof cart.items === 'string') {
+                items = JSON.parse(cart.items || "[]");
+            } else if (Array.isArray(cart.items)) {
+                items = cart.items;
+            }
+            if (!Array.isArray(items)) items = [];
+        } catch (e) {
+            console.error("Failed to parse cart items:", e);
+            items = [];
+        }
+
         let modified = false;
+        const validItems: any[] = [];
 
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
+        for (const item of items) {
+            if (!item || typeof item !== 'object') continue;
 
-            // 0. Ensure productId is synced
-            if (!item.productId && item.product?.id) {
-                item.productId = item.product.id;
-                modified = true;
-            }
-
-            // 1. Force ID to be ProductID for perfect consistency
-            if (item.productId && item.id !== item.productId) {
-                item.id = item.productId;
-                modified = true;
-            }
-
-            // 2. Ensure 'product' snapshot exists
-            if (!item.product && item.productId) {
-                const productData = await prisma.product.findUnique({
-                    where: { id: item.productId }
-                });
-                if (productData) {
-                    item.product = {
-                        id: productData.id,
-                        title: productData.title,
-                        price: productData.price,
-                        imageCover: productData.imageCover,
-                        category: productData.category,
-                        brand: productData.brand
-                    };
-                    modified = true;
+            try {
+                // 0. Ensure productId exists and is valid
+                const pId = item.productId || item.product?.id || item.id;
+                
+                // Basic MongoDB ObjectId check: 24 hex chars
+                if (!pId || typeof pId !== 'string' || !/^[0-9a-fA-F]{24}$/.test(pId)) {
+                    modified = true; // Remove invalid ID items
+                    continue;
                 }
+
+                item.productId = pId;
+                item.id = pId;
+
+                // 2. Ensure 'product' snapshot exists
+                if (!item.product) {
+                    const productData = await prisma.product.findUnique({
+                        where: { id: pId }
+                    });
+                    if (productData) {
+                        item.product = {
+                            id: productData.id,
+                            title: productData.title,
+                            price: productData.price,
+                            imageCover: productData.imageCover,
+                            category: productData.category,
+                            brand: productData.brand
+                        };
+                        modified = true;
+                    } else {
+                        // Product no longer exists, skip it
+                        modified = true;
+                        continue;
+                    }
+                }
+                
+                validItems.push(item);
+            } catch (err) {
+                console.error("Error processing cart item:", err);
+                modified = true;
             }
         }
 
         if (modified) {
             cart = await prisma.cart.update({
                 where: { userId },
-                data: { items }
+                data: { items: JSON.stringify(validItems) }
             });
         }
-        // ------------------------------------------
 
-        return NextResponse.json({ data: cart });
+        // Always return items as a parsed array for the frontend
+        const finalItems = typeof cart.items === 'string' ? JSON.parse(cart.items || '[]') : (Array.isArray(cart.items) ? cart.items : []);
+        return NextResponse.json({ data: { ...cart, items: finalItems } });
 
     } catch (error) {
         console.error("Cart GET error:", error);
@@ -119,15 +144,15 @@ export async function POST(req: Request) {
 
         if (!cart) {
             cart = await prisma.cart.create({
-                data: { userId, items: [] }
+                data: { userId, items: JSON.stringify([]) }
             });
         }
 
         // 3. Handle items logic (JSON array)
-        let items = Array.isArray(cart.items) ? [...(cart.items as any[])] : [];
+        let items = typeof cart.items === 'string' ? JSON.parse(cart.items || "[]") : (Array.isArray(cart.items) ? cart.items : []);
 
         // Find if product already exists (check productId or nested product.id)
-        const existingItemIndex = items.findIndex(item =>
+        const existingItemIndex = items.findIndex((item: any) =>
             item.productId === productId ||
             item.product?.id === productId
         );
@@ -159,12 +184,13 @@ export async function POST(req: Request) {
         // 4. Update cart
         const updatedCart = await prisma.cart.update({
             where: { userId },
-            data: { items }
+            data: { items: JSON.stringify(items) }
         });
 
+        const parsedItemsForResponse = typeof updatedCart.items === 'string' ? JSON.parse(updatedCart.items || '[]') : (Array.isArray(updatedCart.items) ? updatedCart.items : []);
         return NextResponse.json({
             message: "Item added to cart",
-            data: updatedCart
+            data: { ...updatedCart, items: parsedItemsForResponse }
         });
 
     } catch (error) {
@@ -186,7 +212,7 @@ export async function DELETE() {
 
         await prisma.cart.update({
             where: { userId },
-            data: { items: [] }
+            data: { items: JSON.stringify([]) }
         });
 
         return NextResponse.json({ message: "Cart cleared" });
