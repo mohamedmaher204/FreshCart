@@ -41,18 +41,23 @@ export async function PUT(
         }
 
         // --- More Resilient Item Lookup ---
-        let itemsBase = cart.items;
         let items: any[] = [];
-
-        if (Array.isArray(itemsBase)) {
-            items = [...itemsBase];
-        } else if (itemsBase && typeof itemsBase === 'object') {
-            items = Object.values(itemsBase);
+        try {
+            const rawItems = cart.items;
+            if (typeof rawItems === 'string') {
+                items = JSON.parse(rawItems || '[]');
+            } else if (Array.isArray(rawItems)) {
+                items = rawItems;
+            }
+            if (!Array.isArray(items)) items = [];
+        } catch (e) {
+            console.error("Error parsing cart items in PUT:", e);
+            items = [];
         }
 
         const searchId = String(itemId).trim();
 
-        const itemIndex = items.findIndex(item => {
+        const itemIndex = items.findIndex((item: any) => {
             const id = item.id ? String(item.id).trim() : null;
             const pId = item.productId ? String(item.productId).trim() : null;
             const nestedId = item.product?.id ? String(item.product.id).trim() : null;
@@ -73,7 +78,7 @@ export async function PUT(
 
         const updatedCart = await prisma.cart.update({
             where: { userId },
-            data: { items }
+            data: { items: JSON.stringify(items) }
         });
 
         return NextResponse.json({
@@ -112,19 +117,24 @@ export async function DELETE(
         }
 
         // --- Robust Item Removal ---
-        let itemsBase = cart.items;
         let items: any[] = [];
-
-        if (Array.isArray(itemsBase)) {
-            items = [...itemsBase];
-        } else if (itemsBase && typeof itemsBase === 'object') {
-            items = Object.values(itemsBase);
+        try {
+            const rawItems = cart.items;
+            if (typeof rawItems === 'string') {
+                items = JSON.parse(rawItems || '[]');
+            } else if (Array.isArray(rawItems)) {
+                items = rawItems;
+            }
+            if (!Array.isArray(items)) items = [];
+        } catch (e) {
+            console.error("Error parsing cart items in DELETE:", e);
+            items = [];
         }
 
         const searchId = String(itemId).trim();
         const initialLength = items.length;
 
-        const newItems = items.filter(item => {
+        const newItems = items.filter((item: any) => {
             const id = item.id ? String(item.id).trim() : null;
             const pId = item.productId ? String(item.productId).trim() : null;
             const nestedId = item.product?.id ? String(item.product.id).trim() : null;
@@ -138,7 +148,7 @@ export async function DELETE(
 
         await prisma.cart.update({
             where: { userId },
-            data: { items: newItems }
+            data: { items: JSON.stringify(newItems) }
         });
 
         return NextResponse.json({ message: "Item removed from cart" });
