@@ -44,27 +44,39 @@ export async function GET(req: Request) {
         // But since I can't easily change the schema and migrate right now without knowing the user's environment,
         // I will just proceed with creating the order.
 
-        // 3. Get user's cart (assuming it still has items, though webhooks are usually better)
+        // 3. Get user's cart
         const cart = await prisma.cart.findUnique({
             where: { userId }
         });
 
-        if (!cart || !Array.isArray(cart.items) || (cart.items as any[]).length === 0) {
+        // Robust parsing of cart items
+        let cartItems: any[] = [];
+        try {
+            const rawItems = cart?.items;
+            if (typeof rawItems === 'string') {
+                cartItems = JSON.parse(rawItems || '[]');
+            } else if (Array.isArray(rawItems)) {
+                cartItems = rawItems;
+            }
+        } catch (e) {
+            console.error("Error parsing cart in confirm:", e);
+        }
+
+        if (!cart || cartItems.length === 0) {
             // Cart might have been cleared by a webhook already or session was reloaded
             return NextResponse.json({ message: "Order processed or cart empty", status: "already_done" });
         }
 
-        const cartItems = cart.items as any[];
         const totalCartPrice = cartItems.reduce((acc: number, item: any) => acc + (item.product?.price * item.quantity), 0);
 
         // 4. Create the official order
         await prisma.order.create({
             data: {
                 userId,
-                items: cartItems,
+                items: JSON.stringify(cartItems),
                 totalPrice: totalCartPrice,
                 paymentMethod: "online",
-                shippingAddress,
+                shippingAddress: JSON.stringify(shippingAddress),
                 isPaid: true,
                 isDelivered: false
             }
@@ -84,7 +96,7 @@ export async function GET(req: Request) {
         // 6. Clear cart
         await prisma.cart.update({
             where: { userId },
-            data: { items: [] }
+            data: { items: JSON.stringify([]) }
         });
 
         return NextResponse.json({ status: "success", message: "Order confirmed" });
