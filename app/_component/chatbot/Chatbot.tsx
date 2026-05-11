@@ -33,7 +33,7 @@ const CHIPS: QuickChip[] = [
 
 // ─── Markdown-lite renderer ─────────────────────────────────────────────────
 // Renders **bold**, ~~strikethrough~~, • bullets, and _italic_
-function renderMarkdown(text: string): JSX.Element {
+function renderMarkdown(text: string): React.ReactNode {
   const lines = text.split("\n");
   return (
     <>
