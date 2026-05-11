@@ -5,6 +5,7 @@ import Navbar from "./_component/navbar/Navbar";
 import { Toaster } from "sonner";
 import MySessionProviders from "./providers/MySessionProviders";
 import Footer from "./_component/footer/Footer";
+import Chatbot from "./_component/chatbot/Chatbot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <Chatbot />
         </MySessionProviders>
       </body>
     </html>
